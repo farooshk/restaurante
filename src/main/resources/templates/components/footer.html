@@ -1,0 +1,5 @@
+<footer th:fragment="footer" class="px-2 py-2 fixed-bottom bg-dark">
+  <p class="text-center text-secondary">&copy; <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}"></span> -
+    <span th:text="${@environment.getProperty('app.software.name')}"></span> -
+    <span th:text="${@environment.getProperty('app.company.name')}"></span></p>
+</footer>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<style>
+    img {
+        max-width : 100%;
+    }
+</style>
+<head th:replace="components/head :: head"></head>
+<body>
+<div>
+    <navbar th:replace="components/navbar :: navbar"></navbar>
+</div>
+<br><br><br>
+<div class="container text-center">
+    <h1 th:text="${@environment.getProperty('app.software.title')}"></h1>
+    <br>
+    <h1 th:text="${@environment.getProperty('app.software.name')}"></h1>
+</div>
+<br><br>
+<div class="container text-center">
+    <picture>
+        <img th:src="@{images/logo.png}" alt="logo" class="img-fluid" width="75%" height="75%">
+    </picture>
+</div>
+<br><br>
+<footer th:replace="components/footer :: footer">
+</footer>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="components/head :: head"></head>
+<body>
+<div>
+    <navbar th:replace="components/navbar :: navbar"></navbar>
+</div>
+<br><br><br>
+<div class="container">
+    <div class="row">
+        <h4>Tomar Pedido</h4>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/entradas.png}" class="card-img-top" alt="entradas">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Entradas
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Pastelitos</a></li>
+                            <li><a class="dropdown-item" href="#">Porción de Nuggets</a></li>
+                            <li><a class="dropdown-item" href="#">Porción de Papas</a></li>
+                            <li><a class="dropdown-item" href="#">Tapa Patacón</a></li>
+                            <li><a class="dropdown-item" href="#">Tequeños</a></li>
+                            <li><a class="dropdown-item" href="#">Tequeños Fiesta</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/arepa_cabimera.png}" class="card-img-top" alt="arepa_cabimera">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Arepas Cabimeras
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Carne Asada (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Asada (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mechada (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mechada (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Especial (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Especial (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixto Carne y PM (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixto Carne y PM (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo ala Plancha (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo ala Plancha (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Mechado (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Mechado (ER)</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/arepa_rellena.png}" class="card-img-top" alt="arepa_rellena">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Arepas Rellenas
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Carne Asada Q</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Asada QM</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mechada Q</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mechada QM</a></li>
+                            <li><a class="dropdown-item" href="#">Mixta (C, PM) QM</a></li>
+                            <li><a class="dropdown-item" href="#">Mixta (CA, PA)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixta (CM, PM)</a></li>
+                            <li><a class="dropdown-item" href="#">Pabellón</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Asado Q</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Asado QM</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Mechada QM</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Mechado Q</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo y Carne Asada QM</a></li>
+                            <li><a class="dropdown-item" href="#">Queso de Mano</a></li>
+                            <li><a class="dropdown-item" href="#">Reina Pepiada</a></li>
+                            <li><a class="dropdown-item" href="#">Sencilla</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/cachapa.png}" class="card-img-top" alt="cachapa">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Cachapas
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Carne ala Plancha</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mechada</a></li>
+                            <li><a class="dropdown-item" href="#">Cochino Frito</a></li>
+                            <li><a class="dropdown-item" href="#">Doble Queso</a></li>
+                            <li><a class="dropdown-item" href="#">Familiar</a></li>
+                            <li><a class="dropdown-item" href="#">Full Especial</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo ala Plancha</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Mechado</a></li>
+                            <li><a class="dropdown-item" href="#">Queso de Mano</a></li>
+                            <li><a class="dropdown-item" href="#">Queso Rayado</a></li>
+                            <li><a class="dropdown-item" href="#">Tocineta</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/hamburguesa.png}" class="card-img-top" alt="hamburguesa">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Hamburguesas
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Carne (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Chuleta (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Chuleta (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixta P y C (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixta P y C (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">3ple C, P y Chlt (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">3ple C, P y Chlt (ER)</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/patacon.png}" class="card-img-top" alt="patacon">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Patacón Maduro
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Carne Asada (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Asada (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mechada (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mechada (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Especial (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Especial (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixto Carne y PM (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixto Carne y PM (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo ala Plancha (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo ala Plancha (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Mechado (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Mechado (ER)</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/patacon.png}" class="card-img-top" alt="patacon">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Patacón Verde
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Carne Asada (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Asada (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mechada (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mechada (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Especial (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Especial (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixto Carne y PM (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixto Carne y PM (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo ala Plancha (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo ala Plancha (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Mechado (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Mechado (ER)</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/pepito.png}" class="card-img-top" alt="pepito">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Pepitos
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Carne (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Especial (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Especial (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixto CP (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixto CP (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo (ER)</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/perro_caliente.png}" class="card-img-top" alt="perro_caliente">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Perros Calientes
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Carne Mechada (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mechada (L)</a></li>
+                            <li><a class="dropdown-item" href="#">Esp P, C y CH (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Esp P, C y CH (L)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Mechado (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Mechado (L)</a></li>
+                            <li><a class="dropdown-item" href="#">Sencillo (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Sencillo (LECHUGA)</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/salchipapas.png}" class="card-img-top" alt="salchipapas">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Salchipapas
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">4 Personas</a></li>
+                            <li><a class="dropdown-item" href="#">Familiar</a></li>
+                            <li><a class="dropdown-item" href="#">Full</a></li>
+                            <li><a class="dropdown-item" href="#">Porción</a></li>
+                            <li><a class="dropdown-item" href="#">Sencilla Carne</a></li>
+                            <li><a class="dropdown-item" href="#">Sencilla Pollo</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/tumba_rancho.png}" class="card-img-top" alt="tumba_rancho">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Tumba Ranchos
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Carne Mch, QDM (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mch, QDM (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mechada (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mechada (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Especial (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Especial (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixto (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixto (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixto QDM (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Mixto QDM (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Mechado (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Mechado (ER)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo, QDM (EM)</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo, QDM (ER)</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/combos.png}" class="card-img-top" alt="combos">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Combos
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Cachapas con QM</a></li>
+                            <li><a class="dropdown-item" href="#">Hamburguesas</a></li>
+                            <li><a class="dropdown-item" href="#">Mini Pepito + PF</a></li>
+                            <li><a class="dropdown-item" href="#">Perros Calientes</a></li>
+                            <li><a class="dropdown-item" href="#">Salchipapas S de Carne</a></li>
+                            <li><a class="dropdown-item" href="#">Salchipapas S de Pollo</a></li>
+                            <li><a class="dropdown-item" href="#">Tumba Ranchos</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/bebidas.png}" class="card-img-top" alt="bebidas">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Bebidas
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Agua</a></li>
+                            <li><a class="dropdown-item" href="#">Cerveza Polar</a></li>
+                            <li><a class="dropdown-item" href="#">Coca Cola 1,5 LTS</a></li>
+                            <li><a class="dropdown-item" href="#">Gaseosa Personal</a></li>
+                            <li><a class="dropdown-item" href="#">Jugo Hit 1 L</a></li>
+                            <li><a class="dropdown-item" href="#">Maltín Polar</a></li>
+                            <li><a class="dropdown-item" href="#">Pepsi 1,5 LTS</a></li>
+                            <li><a class="dropdown-item" href="#">Pony Malta 1 L</a></li>
+                            <li><a class="dropdown-item" href="#">Pony Malta Personal</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 d-flex justify-content-center mb-3">
+            <div class="card text-center" style="width: 100%;">
+                <div class="card-body">
+                    <img th:src="@{images/adicionales.png}" class="card-img-top" alt="adicionales">
+                </div>
+                <div class="card-footer bg-transparent border-success">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Adicionales
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Carne Asada</a></li>
+                            <li><a class="dropdown-item" href="#">Carne Mechada</a></li>
+                            <li><a class="dropdown-item" href="#">Huevo</a></li>
+                            <li><a class="dropdown-item" href="#">Jamón y Queso</a></li>
+                            <li><a class="dropdown-item" href="#">Pollo Asado</a></li>
+                            <li><a class="dropdown-item" href="#">Queso de Mano</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br><br><br>
+<footer th:replace="components/footer :: footer">
+</footer>
+</body>
+</html>
