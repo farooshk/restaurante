@@ -1,0 +1,59 @@
+/* Estilos generales */
+body {
+    background-color: #f8f9fa;
+}
+
+/* Estilos para las tarjetas de categorías */
+.categoria-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.categoria-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para las tarjetas de productos */
+.producto-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.producto-card:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para la página de login */
+.login-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estilos para los badges y etiquetas de estado */
+.badge {
+    font-size: 0.85rem;
+    padding: 0.4em 0.6em;
+}
+
+/* Estilos para la tabla responsive */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Ajustes para pantallas móviles */
+@media (max-width: 576px) {
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+}

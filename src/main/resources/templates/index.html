@@ -1,29 +1,40 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
-<style>
-    img {
-        max-width : 100%;
-    }
-</style>
-<head th:replace="components/head :: head"></head>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/header :: head('RetailSoft - Inicio')">
+</head>
 <body>
-<div>
-    <navbar th:replace="components/navbar :: navbar"></navbar>
+<nav th:replace="fragments/header :: navbar"></nav>
+
+<div class="container mt-4">
+    <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold">Sistema de Pedidos RestaurantSoft</h1>
+            <p class="col-md-8 fs-4">Bienvenido al sistema de gestión de pedidos. Selecciona una opción para comenzar.</p>
+            <a th:href="@{/pedidos/nuevo}" class="btn btn-primary btn-lg">Nuevo Pedido</a>
+            <a th:href="@{/pedidos}" class="btn btn-outline-primary btn-lg ms-2">Ver Pedidos</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <h2 class="mb-4">Categorías de Productos</h2>
+        <div class="col-md-4 mb-4" th:each="categoria : ${categorias}">
+            <div class="card h-100">
+                <img th:if="${categoria.urlImagen}" th:src="${categoria.urlImagen}" class="card-img-top" alt="Imagen categoría">
+                <img th:unless="${categoria.urlImagen}" src="/static/img/default-category.jpg" class="card-img-top" alt="Imagen por defecto">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${categoria.nombre}">Nombre Categoría</h5>
+                    <p class="card-text">
+                        <span th:text="${categoria.cantidadProductos}">0</span> productos disponibles.
+                    </p>
+                    <a th:href="@{/pedidos/nuevo(categoria=${categoria.id})}" class="btn btn-primary">Ver Productos</a>
+                    <a sec:authorize="hasRole('ADMINISTRADOR')" th:href="@{/admin/categorias/editar/{id}(id=${categoria.id})}" class="btn btn-outline-secondary">Editar</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<br><br><br>
-<div class="container text-center">
-    <h1 th:text="${@environment.getProperty('app.software.title')}"></h1>
-    <br>
-    <h1 th:text="${@environment.getProperty('app.software.name')}"></h1>
-</div>
-<br><br>
-<div class="container text-center">
-    <picture>
-        <img th:src="@{images/logo.png}" alt="logo" class="img-fluid" width="75%" height="75%">
-    </picture>
-</div>
-<br><br>
-<footer th:replace="components/footer :: footer">
-</footer>
+
+<div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

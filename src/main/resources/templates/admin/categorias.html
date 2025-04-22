@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+  <title>Gestión de Categorías</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="container mt-4">
+    <h2>Gestión de Categorías</h2>
+
+    <!-- Formulario para agregar/editar categoría -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Agregar/Editar Categoría</h5>
+      </div>
+      <div class="card-body">
+        <form th:action="@{/admin/categorias/guardar}" method="post" th:object="${categoria}">
+          <input type="hidden" th:field="*{id}" />
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="nombre" th:field="*{nombre}" required>
+          </div>
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="imagen" class="form-label">URL Imagen</label>
+            <input type="text" class="form-control" id="imagen" th:field="*{imagenUrl}">
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <a th:href="@{/admin/categorias}" class="btn btn-secondary">Cancelar</a>
+        </form>
+      </div>
+    </div>
+
+    <!-- Lista de categorías -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Categorías Existentes</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cat : ${categorias}">
+              <td th:text="${cat.id}"></td>
+              <td th:text="${cat.nombre}"></td>
+              <td th:text="${cat.descripcion}"></td>
+              <td>
+                <a th:href="@{/admin/categorias/editar/{id}(id=${cat.id})}" class="btn btn-sm btn-warning">Editar</a>
+                <a th:href="@{/admin/categorias/eliminar/{id}(id=${cat.id})}" class="btn btn-sm btn-danger"
+                   onclick="return confirm('¿Estás seguro de eliminar esta categoría?')">Eliminar</a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

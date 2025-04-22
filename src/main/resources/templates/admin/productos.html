@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+  <title>Gestión de Productos</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="container mt-4">
+    <h2>Gestión de Productos</h2>
+
+    <!-- Formulario para agregar/editar producto -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Agregar/Editar Producto</h5>
+      </div>
+      <div class="card-body">
+        <form th:action="@{/admin/productos/guardar}" method="post" th:object="${producto}">
+          <input type="hidden" th:field="*{id}" />
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="nombre" th:field="*{nombre}" required>
+          </div>
+          <div class="mb-3">
+            <label for="precio" class="form-label">Precio</label>
+            <input type="number" class="form-control" id="precio" th:field="*{precio}" required>
+          </div>
+          <div class="mb-3">
+            <label for="categoria" class="form-label">Categoría</label>
+            <select class="form-control" id="categoria" th:field="*{categoria.id}" required>
+              <option value="">Seleccione una categoría</option>
+              <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nombre}"></option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Ingredientes</label>
+            <div class="row">
+              <div class="col-md-4" th:each="ing : ${ingredientes}">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox"
+                         th:field="*{ingredientes}" th:value="${ing.id}"
+                         th:id="${'ing_' + ing.id}">
+                  <label class="form-check-label" th:for="${'ing_' + ing.id}" th:text="${ing.nombre}"></label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <a th:href="@{/admin/productos}" class="btn btn-secondary">Cancelar</a>
+        </form>
+      </div>
+    </div>
+
+    <!-- Lista de productos -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Productos Existentes</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Precio</th>
+              <th>Categoría</th>
+              <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="prod : ${productos}">
+              <td th:text="${prod.id}"></td>
+              <td th:text="${prod.nombre}"></td>
+              <td th:text="${'$' + #numbers.formatDecimal(prod.precio, 0, 'COMMA', 0, 'POINT')}"></td>
+              <td th:text="${prod.categoria.nombre}"></td>
+              <td>
+                <a th:href="@{/admin/productos/editar/{id}(id=${prod.id})}" class="btn btn-sm btn-warning">Editar</a>
+                <a th:href="@{/admin/productos/eliminar/{id}(id=${prod.id})}" class="btn btn-sm btn-danger"
+                   onclick="return confirm('¿Estás seguro de eliminar este producto?')">Eliminar</a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

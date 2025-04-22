@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Comanda</title>
+  <style>
+    body {
+        font-family: monospace;
+        font-size: 12px;
+        width: 58mm;
+        margin: 0;
+        padding: 5px;
+    }
+
+    .center { text-align: center; }
+    .bold { font-weight: bold; }
+    .line { border-top: 1px dashed black; margin: 5px 0; }
+    .item { margin-bottom: 10px; }
+  </style>
+
+  <style>
+    @media print {
+      #lottie-exito, #lottie-error,
+      .modal-footer,
+      #notificacion-exito, #notificacion-error {
+        display: none !important;
+        @page {
+          size: 58mm auto;
+          margin: 0;
+        }
+      }
+    }
+  </style>
+
+</head>
+<body>
+
+<div class="center bold">Sabor Zuliano</div>
+<div class="center">Pedido #<span th:text="${pedido.pedidoId}">123</span></div>
+<div class="center">Mesa: <span th:text="${pedido.mesa}">1</span></div>
+<div class="center">Mesero: <span th:text="${pedido.mesero}">Juan</span></div>
+<div class="center" th:text="${fechaHora}">--/--/---- --:--</div>
+<div class="line"></div>
+
+<div th:each="item : ${pedido.items}" class="item">
+  <div><span th:text="${item.cantidad}">1</span>x <span th:text="${item.productoNombre}">Arepa</span></div>
+
+  <div th:if="${item.ingredientesAdicionales != null}">
+    <div th:each="extra : ${item.ingredientesAdicionales}">+ <span th:text="${extra}">Queso</span></div>
+  </div>
+
+  <div th:if="${item.ingredientesEliminados != null}">
+    <div th:each="elim : ${item.ingredientesEliminados}">- <span th:text="${elim}">Cebolla</span></div>
+  </div>
+
+  <div th:if="${item.observaciones != null}">
+    <div>Obs: <span th:text="${item.observaciones}">Sin sal</span></div>
+  </div>
+</div>
+
+<div class="line"></div>
+<div class="center">-- FIN DE COMANDA --</div>
+
+<div id="lottie-exito" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+     width: 150px; height: 150px; z-index: 2000;"></div>
+
+<div id="lottie-error" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+     width: 150px; height: 150px; z-index: 2000;"></div>
+
+<div class="modal-footer center">
+  <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir Comanda</button>
+</div>
+
+<div id="notificacion-exito" style="
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(45deg, #43cea2, #185a9d);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    z-index: 1000;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 0.5s ease-in-out;
+">
+  ✅ Comanda enviada a cocina 🍽️
+</div>
+
+<audio id="sonido-confirmacion" preload="auto">
+  <source src="https://www.myinstants.com/media/sounds/cash-register.mp3" type="audio/mpeg">
+</audio>
+
+<div id="notificacion-error" style="
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(45deg, #e53935, #b71c1c);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    z-index: 1000;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 0.5s ease-in-out;
+">
+  ❌ Pedido anulado 🚫
+</div>
+
+<audio id="sonido-error" preload="auto">
+  <source src="https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3" type="audio/mpeg">
+</audio>
+
+<script src="https://unpkg.com/lottie-web@5.10.1/build/player/lottie.min.js"></script>
+
+</body>
+</html>

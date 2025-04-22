@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+  <title>Error del Servidor</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="container text-center mt-5">
+    <div class="card border-danger mb-4">
+      <div class="card-header bg-danger text-white">
+        <h2 class="my-2">Error del Servidor</h2>
+      </div>
+      <div class="card-body">
+        <div class="mb-4">
+          <i class="fas fa-server text-danger" style="font-size: 5rem;"></i>
+        </div>
+        <h1 class="display-1 fw-bold">500</h1>
+        <p class="lead">Ha ocurrido un error interno en el servidor.</p>
+        <p>Nuestro equipo técnico ha sido notificado y está trabajando para resolver el problema.</p>
+        <p>Por favor, intenta nuevamente más tarde.</p>
+        <p th:if="${trace}" class="mt-4">
+          <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#stacktrace" aria-expanded="false" aria-controls="stacktrace">
+            Mostrar detalles técnicos
+          </button>
+        </p>
+        <div class="collapse mt-2" id="stacktrace">
+          <div class="card card-body">
+            <pre class="mt-0" th:text="${trace}"></pre>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="/" class="btn btn-primary">Volver al inicio</a>
+        <button onclick="location.reload();" class="btn btn-outline-secondary">Recargar página</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+  <title>Reportes de Ventas</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="container mt-4">
+    <h2>Reportes de Ventas</h2>
+
+    <!-- Filtros de reportes -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Filtros</h5>
+      </div>
+      <div class="card-body">
+        <form th:action="@{/admin/reportes}" method="get">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="fechaInicio" class="form-label">Fecha Inicio</label>
+              <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" th:value="${fechaInicio}">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="fechaFin" class="form-label">Fecha Fin</label>
+              <input type="date" class="form-control" id="fechaFin" name="fechaFin" th:value="${fechaFin}">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="mesero" class="form-label">Mesero</label>
+              <select class="form-control" id="mesero" name="meseroId">
+                <option value="">Todos los meseros</option>
+                <option th:each="mesero : ${meseros}" th:value="${mesero.id}"
+                        th:text="${mesero.nombre}" th:selected="${mesero.id == meseroId}"></option>
+              </select>
+            </div>
+            <div class="col-md-12">
+              <button type="submit" class="btn btn-primary">Filtrar</button>
+              <a th:href="@{/admin/reportes}" class="btn btn-secondary">Limpiar filtros</a>
+              <a th:href="@{/admin/reportes/exportar(fechaInicio=${fechaInicio},fechaFin=${fechaFin},meseroId=${meseroId})}"
+                 class="btn btn-success float-end">Exportar a Excel</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Resumen de ventas -->
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <div class="card bg-primary text-white">
+          <div class="card-body">
+            <h5 class="card-title">Total Ventas</h5>
+            <h3 class="card-text" th:text="${'$' + #numbers.formatDecimal(totalVentas, 0, 'COMMA', 0, 'POINT')}"></h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card bg-success text-white">
+          <div class="card-body">
+            <h5 class="card-title">Cantidad Pedidos</h5>
+            <h3 class="card-text" th:text="${cantidadPedidos}"></h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card bg-info text-white">
+          <div class="card-body">
+            <h5 class="card-title">Ticket Promedio</h5>
+            <h3 class="card-text" th:text="${cantidadPedidos > 0 ? '$' + #numbers.formatDecimal(totalVentas/cantidadPedidos, 0, 'COMMA', 0, 'POINT') : '$0'}"></h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de pedidos -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Detalle de Pedidos</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Cliente</th>
+              <th>Mesero</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="pedido : ${pedidos}">
+              <td th:text="${pedido.id}"></td>
+              <td th:text="${#temporals.format(pedido.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></td>
+              <td th:text="${pedido.cliente ?: 'Sin especificar'}"></td>
+              <td th:text="${pedido.usuario.nombre}"></td>
+              <td th:text="${'$' + #numbers.formatDecimal(pedido.total, 0, 'COMMA', 0, 'POINT')}"></td>
+              <td>
+                                        <span th:class="${pedido.estado == 'COMPLETADO' ? 'badge bg-success' :
+                                                          (pedido.estado == 'ANULADO' ? 'badge bg-danger' : 'badge bg-warning')}"
+                                              th:text="${pedido.estado}"></span>
+              </td>
+              <td>
+                <a th:href="@{/pedidos/detalle/{id}(id=${pedido.id})}" class="btn btn-sm btn-info">Ver detalle</a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráficas -->
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Ventas por Categoría</h5>
+          </div>
+          <div class="card-body">
+            <canvas id="chartCategorias"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Ventas por Día</h5>
+          </div>
+          <div class="card-body">
+            <canvas id="chartDias"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts para gráficas -->
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Datos para gráfico de categorías
+        var dataCategorias = /*[[${ventasPorCategoria}]]*/ [];
+        var ctxCategorias = document.getElementById('chartCategorias').getContext('2d');
+        new Chart(ctxCategorias, {
+            type: 'pie',
+            data: {
+                labels: dataCategorias.map(item => item.categoria),
+                datasets: [{
+                    data: dataCategorias.map(item => item.total),
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+                        '#C9CBCF', '#7BC8A4', '#E7E9ED', '#1B9E77', '#D95F02', '#7570B3'
+                    ]
+                }]
+            }
+        });
+
+        // Datos para gráfico de días
+        var dataDias = /*[[${ventasPorDia}]]*/ [];
+        var ctxDias = document.getElementById('chartDias').getContext('2d');
+        new Chart(ctxDias, {
+            type: 'bar',
+            data: {
+                labels: dataDias.map(item => item.fecha),
+                datasets: [{
+                    label: 'Ventas por Día',
+                    data: dataDias.map(item => item.total),
+                    backgroundColor: '#36A2EB'
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+  </script>
+</div>
+</body>
+</html>
