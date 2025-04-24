@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let itemsPedido = [];
     let ingredientesAdicionales = [];
     let ingredientesBase = [];
-    let ultimaComandaId = null;
 
     // Elementos del DOM
     const productosContainer = document.getElementById('productosContainer');
@@ -18,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Modal de producto
     const productoModal = new bootstrap.Modal(document.getElementById('productoModal'));
-    const comandaModal = new bootstrap.Modal(document.getElementById('comandaModal'));
+    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
 
     // Manejadores de eventos
     setupEventListeners();
@@ -67,42 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('btnFinalizarPedido').addEventListener('click', function() {
             window.location.href = '/pedidos';
         });
-
-        // Comprobamos que los botones existan antes de asignar eventos
-        const btnVerComanda = document.getElementById('btn-ver-comanda');
-        if (btnVerComanda) {
-            btnVerComanda.addEventListener('click', () => {
-                if (ultimaComandaId) {
-                    window.open(`/pedidos/${ultimaComandaId}/comanda-html`, '_blank');
-                }
-            });
-        }
-
-        document.querySelectorAll('.btn-imprimir-comanda').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const pedidoId = this.getAttribute('data-pedido-id');
-
-                fetch(`/pedidos/${pedidoId}/comanda-texto`)
-                    .then(response => response.text())
-                    .then(texto => {
-                        const blob = new Blob([texto], { type: 'text/plain' });
-                        const url = URL.createObjectURL(blob);
-
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `comanda-${pedidoId}.txt`;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-
-                        alert('✅ Comanda descargada. Ábrela con ESC POS Bluetooth Print Service para imprimir.');
-                    })
-                    .catch(error => {
-                        console.error('❌ Error:', error);
-                        alert('Error al generar la comanda. Intenta nuevamente.');
-                    });
-            });
-        });
     }
 
     function seleccionarCategoria(categoriaId) {
@@ -135,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="card-body">
                         <h6 class="card-title">${producto.nombre}</h6>
                         <p class="card-text">
-                            <small class="text-muted">$${producto.precio}</small>
+                            <small class="text-muted">$${producto.precio.toLocaleString('es-CO')}</small>
                         </p>
                     </div>
                 </div>
@@ -158,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Llenar datos del modal
         document.getElementById('productoId').value = producto.id;
         document.getElementById('productoNombre').value = producto.nombre;
-        document.getElementById('productoPrecio').value = `$${producto.precio}`;
+        document.getElementById('productoPrecio').value = `$${producto.precio.toLocaleString('es-CO')}`;
         document.getElementById('cantidad').value = 1;
         document.getElementById('observaciones').value = '';
 
@@ -278,12 +241,13 @@ document.addEventListener('DOMContentLoaded', function() {
             productoId: productoId,
             productoNombre: productoNombre,
             cantidad: cantidad,
-            precioUnitario: parseFloat(producto.precio),
-            subtotal: (parseFloat(producto.precio) + precioAdicionales) * cantidad,
+            precioUnitario: producto.precio, // ya es entero
+            subtotal: (producto.precio + precioAdicionales) * cantidad, // todos enteros
             observaciones: observaciones,
             ingredientesEliminados: ingredientesEliminados,
             ingredientesAdicionales: adicionales
         };
+
 
         // Agregar al array
         itemsPedido.push(item);
@@ -322,13 +286,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <h6 class="mb-0">${item.cantidad} x ${item.productoNombre}</h6>
-                                <small class="text-muted">$${item.precioUnitario} c/u</small>
+                                <small class="text-muted">$${item.precioUnitario.toLocaleString('es-CO')} c/u</small>
                                 ${adicionalesText ? `<div><small class="text-success">${adicionalesText}</small></div>` : ''}
                                 ${eliminadosText ? `<div><small class="text-danger">${eliminadosText}</small></div>` : ''}
                                 ${item.observaciones ? `<div><small>${item.observaciones}</small></div>` : ''}
                             </div>
                             <div class="text-end">
-                                <div class="fw-bold">$${item.subtotal}</div>
+                                <div class="fw-bold">$${item.subtotal.toLocaleString('es-CO')}</div>
                                 <button class="btn btn-sm btn-outline-danger"
                                         onclick="eliminarItem(${index})">
                                     <i class="fas fa-trash"></i>
@@ -343,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Calcular total
             const total = itemsPedido.reduce((sum, item) => sum + item.subtotal, 0);
-            totalPedidoEl.textContent = `$${total.toFixed(2)}`;
+            totalPedidoEl.textContent = `$${total.toLocaleString('es-CO')}`;
         } else {
             emptyCartMsg.classList.remove('d-none');
             btnGuardarPedido.setAttribute('disabled', 'disabled');
@@ -360,8 +324,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function guardarPedido() {
         // Validar mesa
         const mesa = document.getElementById('mesa').value.trim();
-        const usuario = document.getElementById('usuarioNombre')?.value || 'Mesero';
-
         if (!mesa) {
             alert('Debe ingresar el número de mesa.');
             return;
@@ -393,92 +355,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             return response.json();
         })
-        .then(data => {
-            ultimaComandaId = data.id;
-            mostrarNotificacionExito();
-            agregarAlLogCocina('ENVIADO', pedido.mesa, usuario);
-
-            fetch(`/pedidos/${data.id}/comanda-texto`)
-                .then(res => res.text())
-                .then(texto => {
-                    const ventana = window.open('', '_blank');
-                    ventana.document.write(`
-                        <pre style="font-family: monospace; font-size: 10px;">${texto}</pre>
-                        <script>
-                            location.href = 'intent:#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;';
-                        <\/script>
-                    `);
-                    ventana.document.close();
-                    ventana.focus();
-                });
-
-            comandaModal.show();
+        .then(response => {
+            // Mostrar modal de éxito
+            successModal.show();
         })
         .catch(error => {
-            console.error('❌ Error al guardar el pedido:', error);
+            console.error('Error:', error);
             alert('Error al procesar el pedido. Intente nuevamente.');
         });
     }
-
-    function mostrarNotificacionExito() {
-        const noti = document.getElementById('notificacion-exito');
-        const sonido = document.getElementById('sonido-confirmacion');
-        const lottie = document.getElementById('lottie-exito');
-
-        noti.style.display = 'block';
-        lottie.style.display = 'block';
-        animExito.goToAndPlay(0, true);
-
-        setTimeout(() => {
-            noti.style.opacity = 1;
-            noti.style.transform = 'scale(1)';
-        }, 10);
-
-        if (sonido) sonido.play().catch(() => {});
-
-        setTimeout(() => {
-            noti.style.opacity = 0;
-            noti.style.transform = 'scale(0.9)';
-            setTimeout(() => {
-                noti.style.display = 'none';
-                lottie.style.display = 'none';
-            }, 500);
-        }, 3500);
-    }
-
-    function agregarAlLogCocina(tipo, mesa, mesero) {
-        const log = document.getElementById('log-cocina');
-        const fecha = new Date().toLocaleTimeString();
-        const mensaje = tipo === 'ENVIADO'
-            ? `Enviada [${fecha}] Comanda enviada | Mesa ${mesa} | ${mesero}`
-            : `Anulada [${fecha}] Pedido anulado | Mesa ${mesa} | ${mesero}`;
-
-        const entrada = document.createElement('div');
-        entrada.textContent = mensaje;
-        entrada.style.color = tipo === 'ENVIADO' ? 'green' : 'red';
-
-        log.appendChild(entrada);
-        log.scrollTop = log.scrollHeight;
-
-        const historial = JSON.parse(localStorage.getItem('logCocina')) || [];
-        historial.push(mensaje);
-        localStorage.setItem('logCocina', JSON.stringify(historial));
-    }
-
-    function cargarHistorialLog() {
-        const log = document.getElementById('log-cocina');
-        const historial = JSON.parse(localStorage.getItem('logCocina')) || [];
-
-        historial.forEach(mensaje => {
-            const entrada = document.createElement('div');
-            entrada.textContent = mensaje;
-            entrada.style.color = mensaje.startsWith('Enviada') ? 'green' : 'red';
-            log.appendChild(entrada);
-        });
-
-        log.scrollTop = log.scrollHeight;
-    }
-
-    // Ejecutar al cargar
-    cargarHistorialLog();
 });

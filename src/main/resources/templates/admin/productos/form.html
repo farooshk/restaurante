@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${producto.id != null ? 'Editar Producto' : 'Nuevo Producto'}">Producto</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<!-- Fragmentos comunes -->
+<div th:replace="fragments/header :: head('Productos')"></div>
+<div th:replace="fragments/header :: navbar"></div>
+
+<div class="container mt-4">
+    <h2 th:text="${producto.id != null ? 'Editar Producto' : 'Nuevo Producto'}">Formulario</h2>
+    <form th:action="@{/admin/productos/guardar}" method="post">
+        <input type="hidden" th:field="*{id}"/>
+
+        <label for="nombre" class="form-label">Nombre</label>
+        <input type="text" id="nombre" th:field="*{nombre}" class="form-control" required>
+
+        <label for="descripcion" class="form-label">Descripción</label>
+        <textarea id="descripcion" th:field="*{descripcion}" class="form-control"></textarea>
+
+        <label for="precio" class="form-label">Precio</label>
+        <input type="number" id="precio" th:field="*{precio}" class="form-control" required>
+
+        <label for="categoriaId" class="form-label">Categoría</label>
+        <select id="categoriaId" th:field="*{categoriaId}" class="form-control" required>
+
+            <label for="activo" class="form-label">Estado</label>
+            <select id="activo" th:field="*{activo}" class="form-control">
+
+                <div class="mt-4">
+                    <a th:href="@{/admin/productos}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+    </form>
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

@@ -19,7 +19,8 @@ public class PrinterUtil {
     public String generarTextoComanda(ComandaDTO comanda) {
         List<String> lineas = new ArrayList<>();
 
-        lineas.add("====== COMANDA ======");
+        lineas.add("===== Sabor Zuliano =====");
+        lineas.add("======== COMANDA ========");
         lineas.add("Pedido #: " + comanda.getPedidoId());
         lineas.add("Mesa: " + comanda.getMesa());
         lineas.add("Mesero: " + comanda.getMesero());

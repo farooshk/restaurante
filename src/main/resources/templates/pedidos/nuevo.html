@@ -4,7 +4,6 @@
 </head>
 <body>
 <nav th:replace="fragments/header :: navbar"></nav>
-
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-8">
@@ -20,14 +19,15 @@
                                 <input type="text" class="form-control" id="mesa" required>
                             </div>
                         </div>
-
                         <div class="mb-4">
                             <label class="form-label">Seleccione categoría:</label>
                             <div class="row">
                                 <div class="col-6 col-md-4 mb-3" th:each="categoria : ${categorias}">
                                     <div class="card h-100 categoria-card" th:data-categoria-id="${categoria.id}">
-                                        <img th:if="${categoria.urlImagen}" th:src="${categoria.urlImagen}" class="card-img-top" alt="Imagen categoría">
-                                        <img th:unless="${categoria.urlImagen}" src="/static/img/default-category.jpg" class="card-img-top" alt="Imagen por defecto">
+                                        <img th:if="${categoria.urlImagen}" th:src="${categoria.urlImagen}"
+                                             class="card-img-top" alt="Imagen categoría">
+                                        <img th:unless="${categoria.urlImagen}" src="/static/img/default-category.jpg"
+                                             class="card-img-top" alt="Imagen por defecto">
                                         <div class="card-body text-center">
                                             <h6 class="card-title" th:text="${categoria.nombre}">Nombre Categoría</h6>
                                         </div>
@@ -35,7 +35,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div id="productosContainer" class="mb-4 d-none">
                             <label class="form-label">Seleccione productos:</label>
                             <div class="row" id="productosGrid"></div>
@@ -44,7 +43,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-md-4">
             <div class="card mb-4">
                 <div class="card-header">
@@ -52,18 +50,17 @@
                 </div>
                 <div class="card-body">
                     <div id="itemsPedido"></div>
-
                     <div class="alert alert-info mb-3 text-center" id="emptyCartMsg">
                         No hay productos en el pedido
                     </div>
-
                     <div class="d-flex justify-content-between fw-bold mb-3">
                         <span>Total:</span>
                         <span id="totalPedido">$0</span>
                     </div>
-
                     <div class="d-grid gap-2">
-                        <button type="button" id="btnGuardarPedido" class="btn btn-primary btn-lg" disabled>Guardar Pedido</button>
+                        <button type="button" id="btnGuardarPedido" class="btn btn-primary btn-lg" disabled>Guardar
+                            Pedido
+                        </button>
                         <button type="button" id="btnCancelarPedido" class="btn btn-outline-danger">Cancelar</button>
                     </div>
                 </div>
@@ -71,7 +68,6 @@
         </div>
     </div>
 </div>
-
 <!-- Modal de Producto -->
 <div class="modal fade" id="productoModal" tabindex="-1">
     <div class="modal-dialog">
@@ -95,17 +91,14 @@
                         <label class="form-label">Cantidad:</label>
                         <input type="number" class="form-control" id="cantidad" value="1" min="1">
                     </div>
-
                     <div id="ingredientesBaseContainer" class="mb-3">
                         <label class="form-label">Ingredientes:</label>
                         <div id="ingredientesBaseList"></div>
                     </div>
-
                     <div id="adicionalesContainer" class="mb-3">
                         <label class="form-label">Adicionales:</label>
                         <div id="adicionalesList"></div>
                     </div>
-
                     <div class="mb-3">
                         <label class="form-label">Observaciones:</label>
                         <textarea class="form-control" id="observaciones" rows="2"></textarea>
@@ -119,30 +112,27 @@
         </div>
     </div>
 </div>
-
-<!-- Modal de Comanda -->
-<div class="modal fade" id="comandaModal" tabindex="-1">
+<!-- Modal de Exito -->
+<div class="modal fade" id="successModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Comanda Generada</h5>
+                <h5 class="modal-title">Confirmación de Pedido</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-success">
                     <i class="fas fa-check-circle me-2"></i> Pedido guardado correctamente.
                 </div>
-                <p>La comanda se ha enviado a la impresora.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="btnFinalizarPedido">Aceptar</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="btnFinalizarPedido">Aceptar
+                </button>
             </div>
         </div>
     </div>
 </div>
-
 <div th:replace="fragments/footer :: footer"></div>
-
 <script th:src="@{/static/js/pedido.js}"></script>
 </body>
 </html>

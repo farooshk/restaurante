@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @Controller
@@ -23,19 +24,6 @@ public class IngredienteController {
         List<IngredienteDTO> ingredientes = ingredienteService.listarTodos();
         model.addAttribute("ingredientes", ingredientes);
         return "admin/ingredientes/lista";
-    }
-
-    @GetMapping("/nuevo")
-    public String nuevoIngrediente(Model model) {
-        model.addAttribute("ingrediente", new IngredienteDTO());
-        return "admin/ingredientes/form";
-    }
-
-    @GetMapping("/editar/{id}")
-    public String editarIngrediente(@PathVariable Long id, Model model) {
-        ingredienteService.buscarPorId(id).ifPresent(ingrediente ->
-                model.addAttribute("ingrediente", ingrediente));
-        return "admin/ingredientes/form";
     }
 
     @PostMapping("/guardar")

@@ -2,6 +2,7 @@ package com.retailsoft.service.impl;
 
 import com.retailsoft.dto.UsuarioDTO;
 import com.retailsoft.entity.Usuario;
+import com.retailsoft.mapper.UsuarioMapper;
 import com.retailsoft.repository.UsuarioRepository;
 import com.retailsoft.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,14 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UsuarioMapper usuarioMapper;
 
     @Autowired
     public UsuarioServiceImpl(UsuarioRepository usuarioRepository,
-                              @Lazy PasswordEncoder passwordEncoder) {
+                              @Lazy PasswordEncoder passwordEncoder, UsuarioMapper usuarioMapper) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+        this.usuarioMapper = usuarioMapper;
     }
 
     @Override
@@ -59,10 +62,10 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
-    public void eliminar(Long id) {
+    public void inactivar(Long id) {
         usuarioRepository.findById(id).ifPresent(usuario -> {
-            // Evitar eliminar al usuario "admin"
-            if (usuario.getUsername().equalsIgnoreCase("79915961")) {
+            // Evitar eliminar al usuario superadministrador
+            if (usuario.getUsername().equalsIgnoreCase("fas")) {
                 throw new IllegalStateException("No se puede eliminar al usuario superadministrador.");
             }
             usuario.setActivo(false);
@@ -71,9 +74,29 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    @Transactional
+    public void eliminar(Long id) {
+        usuarioRepository.findById(id).ifPresent(usuario -> {
+            // Evitar eliminar al usuario superadministrador
+            if (usuario.getUsername().equalsIgnoreCase("fas")) {
+                throw new IllegalStateException("No se puede eliminar al usuario superadministrador.");
+            }
+            usuarioRepository.delete(usuario);
+        });
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public boolean existePorUsername(String username) {
         return usuarioRepository.existsByUsername(username);
+    }
+
+    @Override
+    public List<UsuarioDTO> listarUsuariosQueTomanPedidos() {
+        return usuarioRepository.findByTipoUsuarioIn(List.of(Usuario.TipoUsuario.MESERO, Usuario.TipoUsuario.ADMINISTRADOR))
+                .stream()
+                .map(usuarioMapper::toDTO)
+                .toList();
     }
 
     private UsuarioDTO convertirADTO(Usuario usuario) {

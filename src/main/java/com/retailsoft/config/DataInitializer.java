@@ -19,13 +19,13 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        String adminUsername = "79915961";
+        String adminUsername = "admin";
 
         if (usuarioRepository.findByUsername(adminUsername).isEmpty()) {
             Usuario admin = new Usuario();
             admin.setUsername(adminUsername);
-            admin.setPassword(passwordEncoder.encode("farooshk")); // contraseña segura
-            admin.setNombre("Administrador del Sistema");
+            admin.setPassword(passwordEncoder.encode("1234")); // contraseña segura
+            admin.setNombre("Sistemas");
             admin.setTipoUsuario(TipoUsuario.ADMINISTRADOR);
             admin.setActivo(true);
 

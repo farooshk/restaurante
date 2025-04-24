@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Productos</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</head>
+<body>
+
+<!-- Fragmentos comunes -->
+<div th:replace="fragments/header :: head('Productos')"></div>
+<div th:replace="fragments/header :: navbar"></div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Productos</h2>
+        <a th:href="@{/admin/productos/nuevo}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nuevo Producto
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Activo</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="producto : ${productos}">
+                <td th:text="${producto.id}">1</td>
+                <td th:text="${producto.nombre}">Refresco</td>
+                <td th:text="${#numbers.formatInteger(producto.precio)}">3000</td>
+                <td th:text="${producto.descripcion}">Sabor a cola</td>
+                <td th:text="${producto.categoriaNombre}">Bebidas</td>
+                <td>
+                    <span class="badge bg-success" th:if="${producto.activo}">Sí</span>
+                    <span class="badge bg-danger" th:if="${!producto.activo}">No</span>
+                </td>
+                <td>
+                    <a th:href="@{'/admin/productos/editar/' + ${producto.id}}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <form th:action="@{'/admin/productos/eliminar/' + ${producto.id}}" method="post" class="d-inline">
+                        <input type="hidden" name="_method" value="delete">
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar producto?')">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(productos)}">
+                <td colspan="7" class="text-center">No hay productos registrados.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Fragmento footer -->
+<div th:replace="fragments/footer :: footer"></div>
+
+</body>
+</html>

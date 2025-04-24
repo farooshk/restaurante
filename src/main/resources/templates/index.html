@@ -5,36 +5,82 @@
 </head>
 <body>
 <nav th:replace="fragments/header :: navbar"></nav>
-
 <div class="container mt-4">
     <div class="p-5 mb-4 bg-light rounded-3">
         <div class="container-fluid py-5">
-            <h1 class="display-5 fw-bold">Sistema de Pedidos RestaurantSoft</h1>
-            <p class="col-md-8 fs-4">Bienvenido al sistema de gestión de pedidos. Selecciona una opción para comenzar.</p>
-            <a th:href="@{/pedidos/nuevo}" class="btn btn-primary btn-lg">Nuevo Pedido</a>
-            <a th:href="@{/pedidos}" class="btn btn-outline-primary btn-lg ms-2">Ver Pedidos</a>
+            <h1 class="display-5 fw-bold">RETAILSOFT</h1>
+            <p class="col-md-8 fs-4">Bienvenido al sistema de gestión de pedidos y comandas.<br>Selecciona una opción para
+                comenzar.</p>
+            <div class="d-grid gap-2 d-sm-flex">
+                <a th:href="@{/pedidos/nuevo}" class="btn btn-primary btn-lg">Nuevo Pedido</a>
+                <a th:href="@{/pedidos}" class="btn btn-outline-primary btn-lg">Ver Pedidos</a>
+            </div>
         </div>
     </div>
-
     <div class="row">
         <h2 class="mb-4">Categorías de Productos</h2>
         <div class="col-md-4 mb-4" th:each="categoria : ${categorias}">
             <div class="card h-100">
-                <img th:if="${categoria.urlImagen}" th:src="${categoria.urlImagen}" class="card-img-top" alt="Imagen categoría">
-                <img th:unless="${categoria.urlImagen}" src="/static/img/default-category.jpg" class="card-img-top" alt="Imagen por defecto">
+                <img th:if="${categoria.urlImagen}" th:src="${categoria.urlImagen}" class="card-img-top"
+                     alt="Imagen categoría">
+                <img th:unless="${categoria.urlImagen}" src="/static/img/default-category.jpg" class="card-img-top"
+                     alt="Imagen por defecto">
                 <div class="card-body">
                     <h5 class="card-title" th:text="${categoria.nombre}">Nombre Categoría</h5>
                     <p class="card-text">
                         <span th:text="${categoria.cantidadProductos}">0</span> productos disponibles.
                     </p>
                     <a th:href="@{/pedidos/nuevo(categoria=${categoria.id})}" class="btn btn-primary">Ver Productos</a>
-                    <a sec:authorize="hasRole('ADMINISTRADOR')" th:href="@{/admin/categorias/editar/{id}(id=${categoria.id})}" class="btn btn-outline-secondary">Editar</a>
+<!--
+                    <a sec:authorize="hasRole('ADMINISTRADOR')"
+                       href="#"
+                       class="btn btn-outline-secondary"
+                       th:attr="data-id=${categoria.id}, data-nombre=${categoria.nombre}"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modalEditar">
+                        Editar
+                    </a>
+-->
                 </div>
             </div>
         </div>
     </div>
 </div>
+<!-- Modal para editar categoría -->
+<!--
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form th:action="@{/admin/categorias/guardar}" method="post" class="modal-content">
+            <input type="hidden" id="editCategoriaId" name="id">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEditarLabel">Editar Categoría</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="editNombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="editNombre" name="nombre" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    const modalEditar = document.getElementById('modalEditar');
+    modalEditar.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        const nombre = button.getAttribute('data-nombre');
 
+        document.getElementById('editCategoriaId').value = id;
+        document.getElementById('editNombre').value = nombre;
+    });
+</script>
+-->
 <div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

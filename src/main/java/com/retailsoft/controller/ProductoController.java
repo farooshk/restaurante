@@ -31,7 +31,9 @@ public class ProductoController {
     @GetMapping
     public String listarProductos(Model model) {
         List<ProductoDTO> productos = productoService.listarTodos();
+        List<CategoriaDTO> categorias = categoriaService.listarTodas();
         model.addAttribute("productos", productos);
+        model.addAttribute("categorias", categorias);
         return "admin/productos/lista";
     }
 

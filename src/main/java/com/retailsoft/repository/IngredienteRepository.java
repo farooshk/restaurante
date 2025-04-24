@@ -7,6 +7,7 @@ import java.util.List;
 
 @Repository
 public interface IngredienteRepository extends JpaRepository<Ingrediente, Long> {
+
     List<Ingrediente> findByEsAdicionalTrue();
     List<Ingrediente> findAllByOrderByNombreAsc();
 }

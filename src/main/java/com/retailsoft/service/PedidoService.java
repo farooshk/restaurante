@@ -5,6 +5,7 @@ import com.retailsoft.dto.PedidoDTO;
 import com.retailsoft.dto.ResumenVentasDTO;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface PedidoService {
@@ -17,4 +18,8 @@ public interface PedidoService {
     ComandaDTO generarComanda(Long pedidoId);
     boolean marcarComandaImpresa(Long pedidoId);
     ResumenVentasDTO obtenerResumenVentas(LocalDate fecha);
+    List<Map<String, Object>> obtenerVentasPorCategoria(LocalDate fechaInicio, LocalDate fechaFin, Long meseroId);
+    List<Map<String, Object>> obtenerVentasPorDia(LocalDate fechaInicio, LocalDate fechaFin, Long meseroId);
+    ResumenVentasDTO obtenerResumenVentasEntreFechas(LocalDate fechaInicio, LocalDate fechaFin, Long meseroId);
+    byte[] exportarReporte(LocalDate fechaInicio, LocalDate fechaFin, Long meseroId);
 }

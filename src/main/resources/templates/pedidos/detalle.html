@@ -5,158 +5,155 @@
 </head>
 <body>
 <nav th:replace="fragments/header :: navbar"></nav>
-
+<br><br>
 <div class="container mt-4">
-  <div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">Detalle del Pedido #<span th:text="${pedido.id}">1</span></h5>
-      <div>
-        <a th:href="@{/pedidos}" class="btn btn-secondary">
-          <i class="fas fa-arrow-left me-1"></i> Volver
-        </a>
-        <button th:if="${!pedido.comandaImpresa && !pedido.anulado}"
-                th:data-pedido-id="${pedido.id}"
-                class="btn btn-primary ms-2 btn-imprimir-comanda">
-          <i class="fas fa-print me-1"></i> Imprimir Comanda
-        </button>
-      </div>
-    </div>
-    <div class="card-body">
-      <div class="row mb-4">
-        <div class="col-md-6">
-          <p><strong>Mesa:</strong> <span th:text="${pedido.mesa}">Mesa 1</span></p>
-          <p><strong>Mesero:</strong> <span th:text="${pedido.usuarioNombre}">Usuario</span></p>
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Detalle del Pedido #<span th:text="${pedido.id}">1</span></h5>
+            <div class="d-flex gap-2">
+                <a th:href="@{/pedidos}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Volver
+                </a>
+                <button th:if="${!pedido.comandaImpresa && !pedido.anulado}"
+                        th:data-pedido-id="${pedido.id}"
+                        class="btn btn-primary btn-imprimir-comanda">
+                    <i class="fas fa-print me-1"></i> Imprimir Comanda
+                </button>
+            </div>
         </div>
-        <div class="col-md-6">
-          <p><strong>Fecha y Hora:</strong> <span th:text="${#temporals.format(pedido.fechaHora, 'dd/MM/yyyy HH:mm')}">01/01/2025 12:00</span></p>
-          <p>
-            <strong>Estado:</strong>
-            <span class="badge"
-                  th:classappend="${pedido.estado.name() == 'CREADO' ? 'bg-primary' :
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong>Mesa:</strong> <span th:text="${pedido.mesa}">Mesa 1</span></p>
+                    <p><strong>Mesero:</strong> <span th:text="${pedido.usuarioNombre}">Usuario</span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Fecha y Hora:</strong> <span
+                            th:text="${#temporals.format(pedido.fechaHora, 'dd/MM/yyyy HH:mm')}">01/01/2025 12:00</span>
+                    </p>
+                    <p>
+                        <strong>Estado:</strong>
+                        <span class="badge"
+                              th:classappend="${pedido.estado.name() == 'CREADO' ? 'bg-primary' :
                                                   (pedido.estado.name() == 'EN_PREPARACION' ? 'bg-info' :
                                                   (pedido.estado.name() == 'LISTO' ? 'bg-success' :
                                                   (pedido.estado.name() == 'ENTREGADO' ? 'bg-warning' :
                                                   (pedido.estado.name() == 'PAGADO' ? 'bg-secondary' : 'bg-danger'))))}">
                                 <span th:text="${pedido.estado}">Estado</span>
                             </span>
-            <span class="badge bg-danger ms-1" th:if="${pedido.anulado}">ANULADO</span>
-          </p>
-        </div>
-      </div>
-
-      <div class="alert alert-danger" th:if="${pedido.anulado}">
-        <strong>Pedido Anulado</strong>
-        <p th:text="${pedido.motivoAnulacion}">Motivo de anulación</p>
-      </div>
-
-      <h6 class="mb-3">Productos:</h6>
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Precio Unit.</th>
-            <th>Modificaciones</th>
-            <th>Observaciones</th>
-            <th>Subtotal</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr th:each="item : ${pedido.items}">
-            <td th:text="${item.productoNombre}">Producto</td>
-            <td th:text="${item.cantidad}">1</td>
-            <td th:text="${'$' + item.precioUnitario}">$10.000</td>
-            <td>
-              <div th:if="${!item.ingredientesAdicionales.empty}">
-                <strong>+ Adicionales:</strong>
-                <span th:each="ing, iter : ${item.ingredientesAdicionales}">
+                        <span class="badge bg-danger ms-1" th:if="${pedido.anulado}">ANULADO</span>
+                    </p>
+                </div>
+            </div>
+            <div class="alert alert-danger" th:if="${pedido.anulado}">
+                <strong>Pedido Anulado</strong>
+                <p th:text="${pedido.motivoAnulacion}">Motivo de anulación</p>
+            </div>
+            <h6 class="mb-3">Productos:</h6>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unit.</th>
+                        <th>Modificaciones</th>
+                        <th>Observaciones</th>
+                        <th>Subtotal</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${pedido.items}">
+                        <td th:text="${item.productoNombre}">Producto</td>
+                        <td th:text="${item.cantidad}">1</td>
+                        <td th:text="${item.precioUnitario < 1000} ? ${'$ ' + item.precioUnitario} : ${'$ ' + #numbers.formatInteger(item.precioUnitario,3,'POINT')}">$10.000</td>
+                        <td>
+                            <div th:if="${!item.ingredientesAdicionales.empty}">
+                                <strong>Adicionales:</strong>
+                                <span th:each="ing, iter : ${item.ingredientesAdicionales}">
                                             <span th:text="${ing.nombre}">Ingrediente</span>
                                             <span th:if="${!iter.last}">, </span>
                                         </span>
-              </div>
-              <div th:if="${!item.ingredientesEliminados.empty}">
-                <strong>- Sin:</strong>
-                <span th:each="ing, iter : ${item.ingredientesEliminados}">
+                            </div>
+                            <div th:if="${!item.ingredientesEliminados.empty}">
+                                <strong>Sin:</strong>
+                                <span th:each="ing, iter : ${item.ingredientesEliminados}">
                                             <span th:text="${ing.nombre}">Ingrediente</span>
                                             <span th:if="${!iter.last}">, </span>
                                         </span>
-              </div>
-              <span th:if="${item.ingredientesAdicionales.empty && item.ingredientesEliminados.empty}">
+                            </div>
+                            <span th:if="${item.ingredientesAdicionales.empty && item.ingredientesEliminados.empty}">
                                         -
                                     </span>
-            </td>
-            <td th:text="${item.observaciones ?: '-'}">-</td>
-            <td th:text="${'$' + item.subtotal}">$10.000</td>
-          </tr>
-          </tbody>
-          <tfoot>
-          <tr class="table-active">
-            <th colspan="5" class="text-end">Total:</th>
-            <th th:text="${'$' + pedido.total}">$10.000</th>
-          </tr>
-          </tfoot>
-        </table>
-      </div>
-
-      <div class="mt-4" sec:authorize="hasRole('ADMINISTRADOR')">
-        <div class="d-flex justify-content-between">
-          <div>
-            <button th:if="${!pedido.anulado}" class="btn btn-danger btn-anular-pedido"
-                    th:data-pedido-id="${pedido.id}">
-              <i class="fas fa-ban me-1"></i> Anular Pedido
-            </button>
-          </div>
-          <div>
-            <div class="btn-group" th:if="${!pedido.anulado}">
-              <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                Cambiar Estado
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item btn-cambiar-estado" href="#"
-                       th:data-pedido-id="${pedido.id}" data-estado="CREADO">CREADO</a></li>
-                <li><a class="dropdown-item btn-cambiar-estado" href="#"
-                       th:data-pedido-id="${pedido.id}" data-estado="EN_PREPARACION">EN PREPARACIÓN</a></li>
-                <li><a class="dropdown-item btn-cambiar-estado" href="#"
-                       th:data-pedido-id="${pedido.id}" data-estado="LISTO">LISTO</a></li>
-                <li><a class="dropdown-item btn-cambiar-estado" href="#"
-                       th:data-pedido-id="${pedido.id}" data-estado="ENTREGADO">ENTREGADO</a></li>
-                <li><a class="dropdown-item btn-cambiar-estado" href="#"
-                       th:data-pedido-id="${pedido.id}" data-estado="PAGADO">PAGADO</a></li>
-              </ul>
+                        </td>
+                        <td th:text="${item.observaciones ?: '-'}">-</td>
+                        <td th:text="${item.subtotal < 1000} ? ${'$ ' + item.subtotal} : ${'$ ' + #numbers.formatInteger(item.subtotal,3,'POINT')}">$10.000</td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr class="table-active">
+                        <th colspan="5" class="text-end">Total:</th>
+                        <th th:text="${pedido.total < 1000} ? ${'$ ' + pedido.total} : ${'$ ' + #numbers.formatInteger(pedido.total,3,'POINT')}">$10.000</th>
+                    </tr>
+                    </tfoot>
+                </table>
             </div>
-          </div>
+            <div class="mt-4" sec:authorize="hasRole('ADMINISTRADOR')">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <button th:if="${!pedido.anulado}" class="btn btn-danger btn-anular-pedido"
+                                th:data-pedido-id="${pedido.id}">
+                            <i class="fas fa-ban me-1"></i> Anular Pedido
+                        </button>
+                    </div>
+                    <div>
+                        <div class="btn-group" th:if="${!pedido.anulado}">
+                            <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Cambiar Estado
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item btn-cambiar-estado" href="#"
+                                       th:data-pedido-id="${pedido.id}" data-estado="CREADO">CREADO</a></li>
+                                <li><a class="dropdown-item btn-cambiar-estado" href="#"
+                                       th:data-pedido-id="${pedido.id}" data-estado="EN_PREPARACION">EN PREPARACIÓN</a>
+                                </li>
+                                <li><a class="dropdown-item btn-cambiar-estado" href="#"
+                                       th:data-pedido-id="${pedido.id}" data-estado="LISTO">LISTO</a></li>
+                                <li><a class="dropdown-item btn-cambiar-estado" href="#"
+                                       th:data-pedido-id="${pedido.id}" data-estado="ENTREGADO">ENTREGADO</a></li>
+                                <li><a class="dropdown-item btn-cambiar-estado" href="#"
+                                       th:data-pedido-id="${pedido.id}" data-estado="PAGADO">PAGADO</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
-
 <!-- Modal de Anular Pedido -->
 <div class="modal fade" id="anularPedidoModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Anular Pedido</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="pedidoIdAnular">
-        <div class="mb-3">
-          <label for="motivoAnulacion" class="form-label">Motivo de anulación:</label>
-          <textarea class="form-control" id="motivoAnulacion" rows="3" required></textarea>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Anular Pedido</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="pedidoIdAnular">
+                <div class="mb-3">
+                    <label for="motivoAnulacion" class="form-label">Motivo de anulación:</label>
+                    <textarea class="form-control" id="motivoAnulacion" rows="3" required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarAnular">Anular Pedido</button>
+            </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-danger" id="btnConfirmarAnular">Anular Pedido</button>
-      </div>
     </div>
-  </div>
 </div>
-
 <div th:replace="fragments/footer :: footer"></div>
-
 <script th:src="@{/static/js/detalle-pedido.js}"></script>
 </body>
 </html>

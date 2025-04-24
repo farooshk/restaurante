@@ -3,11 +3,11 @@ package com.retailsoft.controller;
 import com.retailsoft.dto.ComandaDTO;
 import com.retailsoft.dto.PedidoDTO;
 import com.retailsoft.dto.ProductoDTO;
-import com.retailsoft.dto.ResumenVentasDTO;
 import com.retailsoft.entity.Pedido;
 import com.retailsoft.service.CategoriaService;
 import com.retailsoft.service.PedidoService;
 import com.retailsoft.service.ProductoService;
+import com.retailsoft.service.UsuarioService;
 import com.retailsoft.utils.PrinterUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -33,6 +33,9 @@ public class PedidoController {
 
     @Autowired
     private ProductoService productoService;
+
+    @Autowired
+    UsuarioService usuarioService;
 
     @Autowired
     private PrinterUtil printerUtil;
@@ -96,30 +99,6 @@ public class PedidoController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{id}/comanda-texto")
-    @ResponseBody
-    public ResponseEntity<String> imprimirTexto(@PathVariable Long id) {
-        ComandaDTO comanda = pedidoService.generarComanda(id);
-        if (comanda == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        String textoComanda = printerUtil.generarTextoComanda(comanda);
-        return ResponseEntity.ok(textoComanda);
-    }
-
-    @GetMapping("/resumen")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public String resumenVentas(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha, Model model) {
-        LocalDate fechaConsulta = fecha != null ? fecha : LocalDate.now();
-        ResumenVentasDTO resumen = pedidoService.obtenerResumenVentas(fechaConsulta);
-
-        model.addAttribute("resumen", resumen);
-        model.addAttribute("fechaConsulta", fechaConsulta);
-
-        return "admin/reportes/ventas";
-    }
-
     @GetMapping("/{id}/comanda-html")
     public String verComanda(@PathVariable Long id, Model model) {
         ComandaDTO comanda = pedidoService.generarComanda(id);
@@ -130,5 +109,17 @@ public class PedidoController {
         model.addAttribute("pedido", comanda);
         model.addAttribute("fechaHora", comanda.getFechaHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
         return "comanda"; // plantilla comanda.html en /templates
+    }
+
+    @GetMapping("/{id}/comanda-texto")
+    @ResponseBody
+    public ResponseEntity<String> imprimirTexto(@PathVariable Long id) {
+        ComandaDTO comanda = pedidoService.generarComanda(id);
+        if (comanda == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String textoComanda = printerUtil.generarTextoComanda(comanda);
+        return ResponseEntity.ok(textoComanda);
     }
 }

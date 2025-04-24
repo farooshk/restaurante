@@ -2,13 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="footer" class="container mt-5">
-  <footer class="py-3 my-4 border-top">
-    <p class="text-center text-muted">© 2025 RetailSoft - Sistema de pedidos para retail</p>
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script th:src="@{/static/js/main.js}"></script>
+    <footer class="py-3 my-4 border-top">
+        <p class="text-center text-secondary">&copy; <span
+                th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}"></span> -
+            <span th:text="${@environment.getProperty('app.software.name')}"></span> -
+            <span th:text="${@environment.getProperty('app.company.name')}"></span></p>
+    </footer>
+    <script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{https://code.jquery.com/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/static/js/main.js}"></script>
 </div>
 </body>
 </html>

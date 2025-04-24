@@ -10,6 +10,8 @@ public interface UsuarioService {
     Optional<UsuarioDTO> buscarPorId(Long id);
     Optional<UsuarioDTO> buscarPorUsername(String username);
     UsuarioDTO guardar(UsuarioDTO usuarioDTO, String password);
+    void inactivar(Long id);
     void eliminar(Long id);
     boolean existePorUsername(String username);
+    List<UsuarioDTO> listarUsuariosQueTomanPedidos();
 }

@@ -25,18 +25,6 @@ public class CategoriaController {
         return "admin/categorias/lista";
     }
 
-    @GetMapping("/nueva")
-    public String nuevaCategoria(Model model) {
-        model.addAttribute("categoria", new CategoriaDTO());
-        return "admin/categorias/form";
-    }
-
-    @GetMapping("/editar/{id}")
-    public String editarCategoria(@PathVariable Long id, Model model) {
-        categoriaService.buscarPorId(id).ifPresent(categoria -> model.addAttribute("categoria", categoria));
-        return "admin/categorias/form";
-    }
-
     @PostMapping("/guardar")
     public String guardarCategoria(@ModelAttribute CategoriaDTO categoria) {
         categoriaService.guardar(categoria);

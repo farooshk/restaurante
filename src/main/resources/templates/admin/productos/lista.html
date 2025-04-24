@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Productos</title>
+    <div th:replace="fragments/header :: head('Productos')"></div>
+</head>
+<body>
+<!-- Fragmentos comunes -->
+<div th:replace="fragments/header :: navbar"></div>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Productos</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productoModal"
+                onclick="abrirModalNuevoProducto()">
+            <i class="fas fa-plus"></i> Nuevo Producto
+        </button>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="producto : ${productos}">
+                <td th:text="${producto.id}">1</td>
+                <td th:text="${producto.nombre}">Coca Cola</td>
+                <td th:text="${producto.categoriaNombre}">Bebidas</td>
+                <td th:text="${producto.precio < 1000} ? ${'$ ' + producto.precio} : ${'$ ' + #numbers.formatInteger(producto.precio,3,'POINT')}">
+                    $5.000
+                </td>
+                <td th:text="${producto.descripcion}">Refresco</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-secondary me-2"
+                            th:attr="data-id=${producto.id},
+                             data-nombre=${producto.nombre},
+                             data-precio=${producto.precio},
+                             data-categoria=${producto.categoriaId},
+                             data-descripcion=${producto.descripcion}"
+                            onclick="abrirModalEditarProducto(this)">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar-producto"
+                            th:data-id="${producto.id}">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(productos)}">
+                <td colspan="6" class="text-center">No hay productos registrados.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Modal para agregar/editar producto -->
+<div class="modal fade" id="productoModal" tabindex="-1" aria-labelledby="productoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form th:action="@{/admin/productos/guardar}" method="post" class="modal-content">
+            <input type="hidden" id="productoId" name="id">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productoModalLabel">Nuevo Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="productoNombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="productoNombre" name="nombre" required>
+                </div>
+                <div class="mb-3">
+                    <label for="productoCategoria" class="form-label">Categoría</label>
+                    <select class="form-select" id="productoCategoria" name="categoriaId" required>
+                        <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nombre}">Bebidas
+                        </option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="productoPrecio" class="form-label">Precio</label>
+                    <input type="number" class="form-control" id="productoPrecio" name="precio" required>
+                </div>
+                <div class="mb-3">
+                    <label for="productoDescripcion" class="form-label">Descripción</label>
+                    <textarea class="form-control" id="productoDescripcion" name="descripcion"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Script -->
+<script>
+    function abrirModalNuevoProducto() {
+        document.getElementById('productoModalLabel').innerText = 'Nuevo Producto';
+        document.getElementById('productoId').value = '';
+        document.getElementById('productoNombre').value = '';
+        document.getElementById('productoPrecio').value = '';
+        document.getElementById('productoCategoria').value = '';
+        document.getElementById('productoDescripcion').value = '';
+    }
+
+    function abrirModalEditarProducto(button) {
+        const modal = new bootstrap.Modal(document.getElementById('productoModal'));
+        document.getElementById('productoModalLabel').innerText = 'Editar Producto';
+        document.getElementById('productoId').value = button.getAttribute('data-id');
+        document.getElementById('productoNombre').value = button.getAttribute('data-nombre');
+        document.getElementById('productoPrecio').value = button.getAttribute('data-precio');
+        const categoriaSelect = document.getElementById('productoCategoria');
+        const categoriaId = button.getAttribute('data-categoria');
+        Array.from(categoriaSelect.options).forEach(option => {
+            option.selected = option.value === categoriaId;
+        });
+        document.getElementById('productoDescripcion').value = button.getAttribute('data-descripcion');
+        modal.show();
+    }
+
+    document.querySelectorAll('.btn-eliminar-producto').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            if (confirm('¿Deseas eliminar este producto?')) {
+                fetch(`/admin/productos/${id}`, { method: 'DELETE' })
+                    .then(response => {
+                        if (response.ok) location.reload();
+                        else alert('Error al eliminar el producto.');
+                    })
+                    .catch(() => alert('Error en la conexión.'));
+            }
+        });
+    });
+</script>
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

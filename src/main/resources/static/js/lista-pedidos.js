@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Evento para imprimir comanda
     document.querySelectorAll('.btn-imprimir-comanda').forEach(btn => {
         btn.addEventListener('click', function () {
             const pedidoId = this.getAttribute('data-pedido-id');

@@ -5,9 +5,15 @@ import com.retailsoft.entity.*;
 import com.retailsoft.repository.*;
 import com.retailsoft.service.PedidoService;
 import com.retailsoft.utils.PrinterUtil;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -103,6 +109,7 @@ public class PedidoServiceImpl implements PedidoService {
             item.setIngredientesEliminados(eliminados);
 
             itemPedidoRepository.save(item);
+            pedido.getItems().add(item);
         }
 
         // Calcular total del pedido
@@ -117,13 +124,19 @@ public class PedidoServiceImpl implements PedidoService {
     public PedidoDTO actualizarPedido(PedidoDTO pedidoDTO) {
         return pedidoRepository.findById(pedidoDTO.getId())
                 .map(pedido -> {
+                    // 1. Actualizar estado
                     pedido.setEstado(pedidoDTO.getEstado());
 
-                    // Eliminar items actuales
+                    // 2. Eliminar los items actuales del pedido (y sus ingredientes)
                     List<ItemPedido> itemsActuales = itemPedidoRepository.findByPedido(pedido);
-                    itemPedidoRepository.deleteAll(itemsActuales);
+                    itemPedidoRepository.deleteAllInBatch(itemsActuales);
 
-                    // Agregar nuevos items
+                    // 3. Limpiar la lista en memoria
+                    pedido.getItems().clear();
+
+                    // 4. Crear nuevos items
+                    List<ItemPedido> nuevosItems = new ArrayList<>();
+
                     for (ItemPedidoDTO itemDTO : pedidoDTO.getItems()) {
                         ItemPedido item = new ItemPedido();
                         item.setPedido(pedido);
@@ -131,36 +144,35 @@ public class PedidoServiceImpl implements PedidoService {
                         item.setPrecioUnitario(itemDTO.getPrecioUnitario());
                         item.setObservaciones(itemDTO.getObservaciones());
 
-                        // Buscar el producto
                         productoRepository.findById(itemDTO.getProductoId())
                                 .ifPresent(item::setProducto);
 
-                        // Agregar ingredientes adicionales
-                        Set<Ingrediente> adicionales = new HashSet<>();
-                        for (IngredienteDTO ingredienteDTO : itemDTO.getIngredientesAdicionales()) {
-                            ingredienteRepository.findById(ingredienteDTO.getId())
-                                    .ifPresent(adicionales::add);
-                        }
+                        Set<Ingrediente> adicionales = itemDTO.getIngredientesAdicionales().stream()
+                                .map(i -> ingredienteRepository.findById(i.getId()).orElse(null))
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toSet());
                         item.setIngredientesAdicionales(adicionales);
 
-                        // Agregar ingredientes eliminados
-                        Set<Ingrediente> eliminados = new HashSet<>();
-                        for (IngredienteDTO ingredienteDTO : itemDTO.getIngredientesEliminados()) {
-                            ingredienteRepository.findById(ingredienteDTO.getId())
-                                    .ifPresent(eliminados::add);
-                        }
+                        Set<Ingrediente> eliminados = itemDTO.getIngredientesEliminados().stream()
+                                .map(i -> ingredienteRepository.findById(i.getId()).orElse(null))
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toSet());
                         item.setIngredientesEliminados(eliminados);
 
-                        itemPedidoRepository.save(item);
+                        nuevosItems.add(item);
+                        pedido.getItems().add(item);
                     }
 
-                    // Calcular total del pedido
+                    // 5. Guardar todos los nuevos items
+                    itemPedidoRepository.saveAll(nuevosItems);
+
+                    // 6. Calcular nuevo total
                     pedido.setTotal(pedido.calcularTotal());
-                    pedido = pedidoRepository.save(pedido);
+                    pedidoRepository.save(pedido);
 
                     return convertirADTO(pedido);
                 })
-                .orElse(null);
+                .orElseThrow(() -> new RuntimeException("Pedido no encontrado con ID: " + pedidoDTO.getId()));
     }
 
     @Override
@@ -244,6 +256,103 @@ public class PedidoServiceImpl implements PedidoService {
                 .collect(Collectors.toList()));
 
         return resumen;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResumenVentasDTO obtenerResumenVentasEntreFechas(LocalDate inicio, LocalDate fin, Long meseroId) {
+        LocalDateTime desde = inicio.atStartOfDay();
+        LocalDateTime hasta = fin.atTime(LocalTime.MAX);
+
+        List<Pedido> pedidos;
+
+        if (meseroId != null) {
+            Usuario mesero = usuarioRepository.findById(meseroId)
+                    .orElseThrow(() -> new RuntimeException("Mesero no encontrado con ID: " + meseroId));
+            pedidos = pedidoRepository.findByUsuarioAndFechaHoraBetweenOrderByFechaHoraDesc(mesero, desde, hasta);
+        } else {
+            pedidos = pedidoRepository.findPedidosDelDia(desde, hasta);
+        }
+
+        int totalVentas = pedidos.stream().mapToInt(Pedido::getTotal).sum();
+        int cantidadPedidos = pedidos.size();
+
+        ResumenVentasDTO resumen = new ResumenVentasDTO();
+        resumen.setFecha(inicio);
+        resumen.setTotalPedidos(cantidadPedidos);
+        resumen.setVentasTotal(totalVentas);
+        resumen.setPedidos(pedidos.stream().map(this::convertirADTO).collect(Collectors.toList()));
+
+        return resumen;
+    }
+
+    @Override
+    public byte[] exportarReporte(LocalDate fechaInicio, LocalDate fechaFin, Long meseroId) {
+        ResumenVentasDTO resumen = obtenerResumenVentasEntreFechas(fechaInicio, fechaFin, meseroId);
+
+        try (Workbook workbook = new HSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Reporte de Ventas");
+
+            int fila = 0;
+
+            // Encabezados
+            Row header = sheet.createRow(fila++);
+            String[] columnas = {"ID", "Fecha", "Mesa", "Mesero", "Total", "Estado"};
+            for (int i = 0; i < columnas.length; i++) {
+                header.createCell(i).setCellValue(columnas[i]);
+            }
+
+            // Datos de pedidos
+            for (PedidoDTO pedido : resumen.getPedidos()) {
+                Row row = sheet.createRow(fila++);
+                row.createCell(0).setCellValue(pedido.getId());
+                row.createCell(1).setCellValue(pedido.getFechaHora().toString());
+                row.createCell(2).setCellValue(pedido.getMesa() != null ? pedido.getMesa() : "Sin especificar");
+                row.createCell(3).setCellValue(pedido.getUsuarioNombre());
+                row.createCell(4).setCellValue(pedido.getTotal());
+                row.createCell(5).setCellValue(pedido.getEstado().name());
+            }
+
+            // Ajustar tamaño de columnas
+            for (int i = 0; i < columnas.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // Convertir workbook a byte array
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                workbook.write(out);
+                return out.toByteArray();
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error generando el reporte Excel", e);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> obtenerVentasPorCategoria(LocalDate fechaInicio, LocalDate fechaFin, Long meseroId) {
+        LocalDateTime inicio = fechaInicio.atStartOfDay();
+        LocalDateTime fin = fechaFin.atTime(LocalTime.MAX);
+
+        if (meseroId != null) {
+            return pedidoRepository.obtenerVentasPorCategoriaYMesero(inicio, fin, meseroId);
+        } else {
+            return pedidoRepository.obtenerVentasPorCategoria(inicio, fin);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> obtenerVentasPorDia(LocalDate fechaInicio, LocalDate fechaFin, Long meseroId) {
+        LocalDateTime inicio = fechaInicio.atStartOfDay();
+        LocalDateTime fin = fechaFin.atTime(LocalTime.MAX);
+
+        if (meseroId != null) {
+            return pedidoRepository.obtenerVentasPorDiaYMesero(inicio, fin, meseroId);
+        } else {
+            return pedidoRepository.obtenerVentasPorDia(inicio, fin);
+        }
     }
 
     private PedidoDTO convertirADTO(Pedido pedido) {

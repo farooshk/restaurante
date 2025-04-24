@@ -48,7 +48,14 @@ public class UsuarioController {
         return "redirect:/admin/usuarios";
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/inactivar/{id}")
+    @ResponseBody
+    public ResponseEntity<Void> inactivarUsuario(@PathVariable Long id) {
+        usuarioService.inactivar(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/eliminar/{id}")
     @ResponseBody
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         usuarioService.eliminar(id);

@@ -3,36 +3,36 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout}">
 <head>
-  <title>Acceso Denegado</title>
+    <title>Acceso Denegado</title>
 </head>
 <body>
 <div layout:fragment="content">
-  <div class="container text-center mt-5">
-    <div class="card border-danger mb-4">
-      <div class="card-header bg-danger text-white">
-        <h2 class="my-2">Acceso Denegado</h2>
-      </div>
-      <div class="card-body">
-        <div class="mb-4">
-          <i class="fas fa-lock text-danger" style="font-size: 5rem;"></i>
+    <div class="container text-center mt-5">
+        <div class="card border-danger mb-4">
+            <div class="card-header bg-danger text-white">
+                <h2 class="my-2">Acceso Denegado</h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <i class="fas fa-lock text-danger" style="font-size: 5rem;"></i>
+                </div>
+                <h1 class="display-1 fw-bold">403</h1>
+                <p class="lead">No tienes permisos para acceder a esta página.</p>
+                <p>Si crees que esto es un error, contacta al administrador del sistema.</p>
+                <div th:if="${#authorization.expression('isAuthenticated()')}" class="mt-3">
+                    <p>Has iniciado sesión como: <span th:text="${#authentication.name}" class="fw-bold"></span></p>
+                    <p>Tu rol no tiene permisos suficientes para acceder a este recurso.</p>
+                </div>
+                <div th:unless="${#authorization.expression('isAuthenticated()')}" class="mt-3">
+                    <p>Debes iniciar sesión para acceder a este recurso.</p>
+                    <a th:href="@{/login}" class="btn btn-outline-primary mt-2">Iniciar Sesión</a>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/" class="btn btn-primary">Volver al inicio</a>
+            </div>
         </div>
-        <h1 class="display-1 fw-bold">403</h1>
-        <p class="lead">No tienes permisos para acceder a esta página.</p>
-        <p>Si crees que esto es un error, contacta al administrador del sistema.</p>
-        <div th:if="${#authorization.expression('isAuthenticated()')}" class="mt-3">
-          <p>Has iniciado sesión como: <span th:text="${#authentication.name}" class="fw-bold"></span></p>
-          <p>Tu rol no tiene permisos suficientes para acceder a este recurso.</p>
-        </div>
-        <div th:unless="${#authorization.expression('isAuthenticated()')}" class="mt-3">
-          <p>Debes iniciar sesión para acceder a este recurso.</p>
-          <a th:href="@{/login}" class="btn btn-outline-primary mt-2">Iniciar Sesión</a>
-        </div>
-      </div>
-      <div class="card-footer">
-        <a href="/" class="btn btn-primary">Volver al inicio</a>
-      </div>
     </div>
-  </div>
 </div>
 </body>
 </html>
