@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .defaultSuccessUrl("/", true)
                         .failureHandler(customAuthFailureHandler)
+                        .loginProcessingUrl("/login")
                         .permitAll()
                 )
                 .logout(logout -> logout

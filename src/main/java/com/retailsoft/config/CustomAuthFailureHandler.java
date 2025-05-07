@@ -17,6 +17,7 @@ public class CustomAuthFailureHandler extends SimpleUrlAuthenticationFailureHand
                                         HttpServletResponse response,
                                         AuthenticationException exception)
             throws IOException, ServletException {
+        System.out.println("¡Autenticación fallida! Excepción: " + exception.getMessage());
         request.getSession().setAttribute("mensajeError", "Usuario o contraseña incorrectos");
         getRedirectStrategy().sendRedirect(request, response, "/login");
     }
