@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -65,7 +66,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public void inactivar(Long id) {
         usuarioRepository.findById(id).ifPresent(usuario -> {
             // Evitar eliminar al usuario superadministrador
-            if (usuario.getUsername().equalsIgnoreCase("fas")) {
+            if (usuario.getUsername().equalsIgnoreCase("sistemas")) {
                 throw new IllegalStateException("No se puede eliminar al usuario superadministrador.");
             }
             usuario.setActivo(false);
@@ -78,7 +79,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public void eliminar(Long id) {
         usuarioRepository.findById(id).ifPresent(usuario -> {
             // Evitar eliminar al usuario superadministrador
-            if (usuario.getUsername().equalsIgnoreCase("fas")) {
+            if (usuario.getUsername().equalsIgnoreCase("sistemas")) {
                 throw new IllegalStateException("No se puede eliminar al usuario superadministrador.");
             }
             usuarioRepository.delete(usuario);

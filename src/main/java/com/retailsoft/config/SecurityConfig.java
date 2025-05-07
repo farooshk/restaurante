@@ -1,5 +1,6 @@
 package com.retailsoft.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private CustomAuthFailureHandler customAuthFailureHandler;
+
+    @Autowired
+    private CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
     private final UserDetailsService userDetailsService;
 
@@ -52,14 +59,13 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .defaultSuccessUrl("/", true)
-                        .failureUrl("/login?error=true")
+                        .failureHandler(customAuthFailureHandler)
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout=true")
-                        .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
                         .permitAll()
                 )
                 .csrf(csrf -> csrf.disable());

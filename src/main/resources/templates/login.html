@@ -9,14 +9,17 @@
             <div class="card shadow-lg">
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
-                        <img src="/static/img/logo.png" alt="RetailSoft" height="200">
+                        <img th:src="@{/static/img/logo.png}" alt="RetailSoft" height="200">
                         <h2 class="mt-3">Iniciar Sesión</h2>
                     </div>
-                    <div th:if="${param.error}" class="alert alert-danger">
-                        Usuario o contraseña incorrectos
+                    <div th:if="${error}" class="alert alert-danger">
+                        <span th:text="${error}"></span>
                     </div>
-                    <div th:if="${param.logout}" class="alert alert-success">
-                        Sesión cerrada correctamente
+                    <div th:if="${mensajeError}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <span th:text="${mensajeError}"></span>
+                    </div>
+                    <div th:if="${mensajeLogout}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <span th:text="${mensajeLogout}"></span>
                     </div>
                     <form th:action="@{/login}" method="post">
                         <div class="mb-3">
@@ -36,6 +39,12 @@
         </div>
     </div>
 </div>
+<script>
+    setTimeout(() => {
+        const alert = document.querySelector('.alert');
+        if (alert) alert.classList.remove('show');
+    }, 4000);
+</script>
 <div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

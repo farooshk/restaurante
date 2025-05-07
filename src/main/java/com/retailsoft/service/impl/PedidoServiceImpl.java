@@ -5,10 +5,10 @@ import com.retailsoft.entity.*;
 import com.retailsoft.repository.*;
 import com.retailsoft.service.PedidoService;
 import com.retailsoft.utils.PrinterUtil;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -290,7 +290,7 @@ public class PedidoServiceImpl implements PedidoService {
     public byte[] exportarReporte(LocalDate fechaInicio, LocalDate fechaFin, Long meseroId) {
         ResumenVentasDTO resumen = obtenerResumenVentasEntreFechas(fechaInicio, fechaFin, meseroId);
 
-        try (Workbook workbook = new HSSFWorkbook()) {
+        try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Reporte de Ventas");
 
             int fila = 0;

@@ -3,6 +3,7 @@ package com.retailsoft.utils;
 import com.retailsoft.dto.ComandaDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +11,8 @@ import java.util.List;
 @Component
 public class PrinterUtil {
 
-    @Value("${retailsoft.app.printer.name}")
-    private String printerName;
+    @Value("${app.customer.name}")
+    private String customer;
 
     // Ancho del papel - caracteres por línea para papel de 58mm
     private static final int CARACTERES_POR_LINEA = 32;
@@ -19,7 +20,7 @@ public class PrinterUtil {
     public String generarTextoComanda(ComandaDTO comanda) {
         List<String> lineas = new ArrayList<>();
 
-        lineas.add("===== Sabor Zuliano =====");
+        lineas.add("===== "+ customer +" =====");
         lineas.add("======== COMANDA ========");
         lineas.add("Pedido #: " + comanda.getPedidoId());
         lineas.add("Mesa: " + comanda.getMesa());
