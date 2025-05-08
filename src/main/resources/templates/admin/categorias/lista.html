@@ -29,12 +29,11 @@
                 <td th:text="${categoria.id}">1</td>
                 <td th:text="${categoria.nombre}">Bebidas</td>
                 <td>
-                    <button class="btn btn-sm btn-outline-secondary me-2 btn-editar-categoria"
-                            th:attr="data-id=${categoria.id}, data-nombre=${categoria.nombre}">
+                    <a th:href="@{/admin/categorias/editar/{id}(id=${categoria.id})}" class="btn btn-sm btn-warning">
                         <i class="fas fa-edit"></i> Editar
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar"
-                            th:data-id="${categoria.id}">
+                    </a>
+                    <button class="btn btn-sm btn-danger eliminar-categoria" th:data-id="${categoria.id}"
+                            th:data-nombre="${categoria.nombre}" th:data-productos="${categoria.cantidadProductos}">
                         <i class="fas fa-trash"></i> Eliminar
                     </button>
                 </td>

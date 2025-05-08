@@ -8,10 +8,9 @@ import java.util.Optional;
 public interface ProductoService {
 
     List<ProductoDTO> listarTodos();
-    List<ProductoDTO> listarActivos();
     List<ProductoDTO> listarPorCategoria(Long categoriaId);
     Optional<ProductoDTO> buscarPorId(Long id);
+    boolean estaEnPedidos(Long id);
     ProductoDTO guardar(ProductoDTO productoDTO);
     void eliminar(Long id);
-    void cambiarEstado(Long id, boolean activo);
 }

@@ -11,4 +11,5 @@ public interface CategoriaService {
     Optional<CategoriaDTO> buscarPorId(Long id);
     CategoriaDTO guardar(CategoriaDTO categoriaDTO);
     void eliminar(Long id);
+    boolean tieneProductosAsociados(Long id);
 }

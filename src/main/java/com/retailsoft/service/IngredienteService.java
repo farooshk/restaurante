@@ -8,8 +8,8 @@ import java.util.Optional;
 public interface IngredienteService {
 
     List<IngredienteDTO> listarTodos();
-    List<IngredienteDTO> listarAdicionales();
     Optional<IngredienteDTO> buscarPorId(Long id);
     IngredienteDTO guardar(IngredienteDTO ingredienteDTO);
     void eliminar(Long id);
+    boolean estaEnProductos(Long id);
 }

@@ -4,15 +4,14 @@ import com.retailsoft.dto.IngredienteDTO;
 import com.retailsoft.dto.ProductoDTO;
 import com.retailsoft.entity.Ingrediente;
 import com.retailsoft.entity.Producto;
-import com.retailsoft.repository.CategoriaRepository;
-import com.retailsoft.repository.IngredienteRepository;
+import com.retailsoft.repository.PedidoRepository;
 import com.retailsoft.repository.ProductoRepository;
+import com.retailsoft.service.FileStorageService;
 import com.retailsoft.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -21,18 +20,14 @@ import java.util.stream.Collectors;
 @Service
 public class ProductoServiceImpl implements ProductoService {
 
-    private final ProductoRepository productoRepository;
-    private final CategoriaRepository categoriaRepository;
-    private final IngredienteRepository ingredienteRepository;
+    @Autowired
+    private ProductoRepository productoRepository;
 
     @Autowired
-    public ProductoServiceImpl(ProductoRepository productoRepository,
-                               CategoriaRepository categoriaRepository,
-                               IngredienteRepository ingredienteRepository) {
-        this.productoRepository = productoRepository;
-        this.categoriaRepository = categoriaRepository;
-        this.ingredienteRepository = ingredienteRepository;
-    }
+    private FileStorageService fileStorageService;
+
+    @Autowired
+    private PedidoRepository pedidoRepository; // Para verificar si el producto está en pedidos
 
     @Override
     @Transactional(readOnly = true)
@@ -44,20 +39,10 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductoDTO> listarActivos() {
-        return productoRepository.findByActivoTrueOrderByNombreAsc().stream()
+    public List<ProductoDTO> listarPorCategoria(Long categoriaId) {
+        return productoRepository.findByCategoriaId(categoriaId).stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ProductoDTO> listarPorCategoria(Long categoriaId) {
-        return categoriaRepository.findById(categoriaId)
-                .map(categoria -> productoRepository.findByActivoTrueAndCategoriaOrderByNombreAsc(categoria).stream()
-                        .map(this::convertirADTO)
-                        .collect(Collectors.toList()))
-                .orElse(List.of());
     }
 
     @Override
@@ -67,80 +52,113 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public boolean estaEnPedidos(Long id) {
+        // Implementar lógica para verificar si el producto está en algún pedido
+        return pedidoRepository.existsByItemsPedidoProductoId(id);
+    }
+
+    @Override
     @Transactional
     public ProductoDTO guardar(ProductoDTO productoDTO) {
-        Producto producto = convertirAEntidad(productoDTO);
+        Producto producto;
+        String imagenAnterior = null;
+
+        // Si es actualización, obtener la entidad existente
+        if (productoDTO.getId() != null) {
+            producto = productoRepository.findById(productoDTO.getId())
+                    .orElse(new Producto());
+
+            // Guardar la URL de la imagen anterior
+            imagenAnterior = producto.getUrlImagen();
+
+            // Si no se proporciona una nueva imagen, mantener la existente
+            if (productoDTO.getUrlImagen() == null || productoDTO.getUrlImagen().isEmpty()) {
+                productoDTO.setUrlImagen(imagenAnterior);
+            }
+        } else {
+            producto = new Producto();
+        }
+
+        // Actualizar propiedades básicas
+        producto.setNombre(productoDTO.getNombre());
+        producto.setDescripcion(productoDTO.getDescripcion());
+        producto.setPrecio(productoDTO.getPrecio());
+        producto.setDisponible(productoDTO.isDisponible());
+        producto.setUrlImagen(productoDTO.getUrlImagen());
+
+        // Actualizar categoría
+        if (productoDTO.getCategoria() != null && productoDTO.getCategoria().getId() != null) {
+            Categoria categoria = new Categoria();
+            categoria.setId(productoDTO.getCategoria().getId());
+            producto.setCategoria(categoria);
+        }
+
+        // Actualizar ingredientes
+        if (productoDTO.getIngredientes() != null) {
+            Set<Ingrediente> ingredientes = productoDTO.getIngredientes().stream()
+                    .map(dto -> {
+                        Ingrediente ingrediente = new Ingrediente();
+                        ingrediente.setId(dto.getId());
+                        return ingrediente;
+                    })
+                    .collect(Collectors.toSet());
+            producto.setIngredientes(ingredientes);
+        }
+
+        // Guardar y convertir a DTO
         producto = productoRepository.save(producto);
+
+        // Si se actualizó la imagen, eliminar la anterior
+        if (imagenAnterior != null && !imagenAnterior.equals(producto.getUrlImagen())) {
+            fileStorageService.eliminarArchivo(imagenAnterior);
+        }
+
         return convertirADTO(producto);
     }
 
     @Override
     @Transactional
     public void eliminar(Long id) {
-        productoRepository.deleteById(id);
-    }
-
-    @Override
-    @Transactional
-    public void cambiarEstado(Long id, boolean activo) {
+        // Obtener el producto para eliminar su imagen
         productoRepository.findById(id).ifPresent(producto -> {
-            producto.setActivo(activo);
-            productoRepository.save(producto);
+            if (producto.getUrlImagen() != null) {
+                fileStorageService.eliminarArchivo(producto.getUrlImagen());
+            }
+            productoRepository.deleteById(id);
         });
     }
 
     private ProductoDTO convertirADTO(Producto producto) {
-        ProductoDTO dto = ProductoDTO.builder()
-                .id(producto.getId())
-                .nombre(producto.getNombre())
-                .precio(producto.getPrecio())
-                .descripcion(producto.getDescripcion())
-                .categoriaId(producto.getCategoria().getId())
-                .categoriaNombre(producto.getCategoria().getNombre())
-                .activo(producto.isActivo())
-                .build();
+        ProductoDTO dto = new ProductoDTO();
+        dto.setId(producto.getId());
+        dto.setNombre(producto.getNombre());
+        dto.setDescripcion(producto.getDescripcion());
+        dto.setPrecio(producto.getPrecio());
+        dto.setDisponible(producto.isDisponible());
+        dto.setUrlImagen(producto.getUrlImagen());
 
-        // Convertir ingredientes base
-        dto.setIngredientesBase(producto.getIngredientesBase().stream()
-                .map(this::convertirAIngredienteDTO)
-                .collect(Collectors.toList()));
+        // Convertir categoría
+        if (producto.getCategoria() != null) {
+            CategoriaDTO categoriaDTO = new CategoriaDTO();
+            categoriaDTO.setId(producto.getCategoria().getId());
+            categoriaDTO.setNombre(producto.getCategoria().getNombre());
+            dto.setCategoria(categoriaDTO);
+        }
+
+        // Convertir ingredientes
+        if (producto.getIngredientes() != null) {
+            List<IngredienteDTO> ingredientesDTO = producto.getIngredientes().stream()
+                    .map(ingrediente -> {
+                        IngredienteDTO ingredienteDTO = new IngredienteDTO();
+                        ingredienteDTO.setId(ingrediente.getId());
+                        ingredienteDTO.setNombre(ingrediente.getNombre());
+                        return ingredienteDTO;
+                    })
+                    .collect(Collectors.toList());
+            dto.setIngredientes(ingredientesDTO);
+        }
 
         return dto;
-    }
-
-    private Producto convertirAEntidad(ProductoDTO dto) {
-        Producto producto = new Producto();
-        producto.setId(dto.getId());
-        producto.setNombre(dto.getNombre());
-        producto.setPrecio(dto.getPrecio());
-        producto.setDescripcion(dto.getDescripcion());
-        producto.setActivo(dto.isActivo());
-
-        // Obtener la categoría
-        if (dto.getCategoriaId() != null) {
-            categoriaRepository.findById(dto.getCategoriaId())
-                    .ifPresent(producto::setCategoria);
-        }
-
-        // Obtener ingredientes base
-        if (dto.getIngredientesBase() != null && !dto.getIngredientesBase().isEmpty()) {
-            Set<Ingrediente> ingredientes = new HashSet<>();
-            for (IngredienteDTO ingredienteDTO : dto.getIngredientesBase()) {
-                ingredienteRepository.findById(ingredienteDTO.getId())
-                        .ifPresent(ingredientes::add);
-            }
-            producto.setIngredientesBase(ingredientes);
-        }
-
-        return producto;
-    }
-
-    private IngredienteDTO convertirAIngredienteDTO(Ingrediente ingrediente) {
-        return IngredienteDTO.builder()
-                .id(ingrediente.getId())
-                .nombre(ingrediente.getNombre())
-                .precioPorcion(ingrediente.getPrecioPorcion())
-                .esAdicional(ingrediente.isEsAdicional())
-                .build();
     }
 }
