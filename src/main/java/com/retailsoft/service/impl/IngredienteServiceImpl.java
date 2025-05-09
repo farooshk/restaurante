@@ -5,10 +5,12 @@ import com.retailsoft.entity.Ingrediente;
 import com.retailsoft.repository.IngredienteRepository;
 import com.retailsoft.repository.ProductoRepository;
 import com.retailsoft.service.IngredienteService;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,7 +27,19 @@ public class IngredienteServiceImpl implements IngredienteService {
     @Override
     @Transactional(readOnly = true)
     public List<IngredienteDTO> listarTodos() {
-        return ingredienteRepository.findAll().stream()
+        // Usa una consulta específica para cargar todo lo relacionado de una vez
+        List<Ingrediente> ingredientes = ingredienteRepository.findAll();
+        // Crear una lista nueva para desacoplar de la sesión de Hibernate
+        List<Ingrediente> ingredienteList = new ArrayList<>(ingredientes);
+        return ingredienteList.stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<IngredienteDTO> listarAdicionales() {
+        return ingredienteRepository.findByEsAdicionalTrue().stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
@@ -68,6 +82,8 @@ public class IngredienteServiceImpl implements IngredienteService {
         ingrediente.setNombre(ingredienteDTO.getNombre());
         ingrediente.setDescripcion(ingredienteDTO.getDescripcion());
         ingrediente.setDisponible(ingredienteDTO.isDisponible());
+        ingrediente.setPrecioPorcion(ingredienteDTO.getPrecioPorcion());
+        ingrediente.setEsAdicional(ingredienteDTO.isEsAdicional());
 
         // Guardar y convertir a DTO
         ingrediente = ingredienteRepository.save(ingrediente);
@@ -86,8 +102,20 @@ public class IngredienteServiceImpl implements IngredienteService {
         dto.setId(ingrediente.getId());
         dto.setNombre(ingrediente.getNombre());
         dto.setDescripcion(ingrediente.getDescripcion());
+        dto.setPrecioPorcion(ingrediente.getPrecioPorcion());
         dto.setDisponible(ingrediente.isDisponible());
-        dto.setCantidadProductos(ingrediente.getProductos() != null ? ingrediente.getProductos().size() : 0);
+        dto.setEsAdicional(ingrediente.isEsAdicional());
+
+        // Solo si quieres mostrar cuántos productos lo usan
+        if (ingrediente.getProductos() != null) {
+            try {
+                Hibernate.initialize(ingrediente.getProductos());
+                dto.setCantidadProductos(ingrediente.getProductos().size());
+            } catch (Exception e) {
+                dto.setCantidadProductos(0);
+            }
+        }
+
         return dto;
     }
 }

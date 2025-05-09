@@ -4,9 +4,9 @@ import com.retailsoft.dto.RolDTO;
 import com.retailsoft.entity.Rol;
 import com.retailsoft.repository.RolRepository;
 import com.retailsoft.service.RolService;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;

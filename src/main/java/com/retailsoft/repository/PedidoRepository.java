@@ -14,8 +14,9 @@ import java.util.Map;
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
-    boolean existsByItemsPedidoProductoId(Long id);
+    boolean existsByItemsProductoId(Long id);
     boolean existsByUsuarioId(Long id);
+
     List<Pedido> findByUsuarioAndFechaHoraBetweenOrderByFechaHoraDesc(Usuario usuario, LocalDateTime inicio, LocalDateTime fin);
 
     @Query("SELECT p FROM Pedido p WHERE p.fechaHora BETWEEN ?1 AND ?2 AND p.anulado = false ORDER BY p.fechaHora DESC")

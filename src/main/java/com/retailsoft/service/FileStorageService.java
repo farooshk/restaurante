@@ -9,12 +9,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class FileStorageService {
 
-    private final String uploadDir = "src/main/resources/static/uploads/";
+    // Cambia la ubicación del directorio de subida
+    private final String uploadDir = System.getProperty("user.dir") + "/uploads/";
 
     public String almacenarArchivo(MultipartFile archivo, String subdirectorio) throws IOException {
         // Crear directorio si no existe
@@ -27,14 +29,20 @@ public class FileStorageService {
         if (nombreOriginal.contains(".")) {
             extension = nombreOriginal.substring(nombreOriginal.lastIndexOf("."));
         }
-        String nombreArchivo = UUID.randomUUID().toString() + extension;
+        String nombreArchivo = String.format("img_%s" + extension, fechaYHoraActual());
 
         // Guardar archivo
         Path rutaCompleta = directorioPath.resolve(nombreArchivo);
         Files.copy(archivo.getInputStream(), rutaCompleta, StandardCopyOption.REPLACE_EXISTING);
 
-        // Devolver la ruta relativa para guardar en la base de datos
+        // Devolver la ruta relativa con el nuevo prefijo
         return "/uploads/" + subdirectorio + "/" + nombreArchivo;
+    }
+
+    private String fechaYHoraActual(){
+        LocalDateTime myDate = LocalDateTime.now();
+        DateTimeFormatter myFormatDate = DateTimeFormatter.ofPattern("ddMMyyyy_HH_mm_ss");
+        return myDate.format(myFormatDate);
     }
 
     public void eliminarArchivo(String rutaRelativa) {
@@ -44,7 +52,7 @@ public class FileStorageService {
 
         try {
             // Convertir la ruta relativa a absoluta
-            String rutaAbsoluta = "src/main/resources/static" + rutaRelativa;
+            String rutaAbsoluta = "/uploads/" + rutaRelativa;
             Path archivo = Paths.get(rutaAbsoluta);
             Files.deleteIfExists(archivo);
         } catch (IOException e) {

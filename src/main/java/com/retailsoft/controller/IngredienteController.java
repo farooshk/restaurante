@@ -4,8 +4,6 @@ import com.retailsoft.dto.IngredienteDTO;
 import com.retailsoft.service.IngredienteService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -29,7 +26,6 @@ public class IngredienteController {
     public String listarIngredientes(Model model) {
         List<IngredienteDTO> ingredientes = ingredienteService.listarTodos();
         model.addAttribute("ingredientes", ingredientes);
-        model.addAttribute("nuevoIngrediente", new IngredienteDTO());
         return "admin/ingredientes/lista";
     }
 
@@ -59,6 +55,7 @@ public class IngredienteController {
             RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("error", "Error al guardar el ingrediente");
             return "admin/ingredientes/form";
         }
 
@@ -72,21 +69,14 @@ public class IngredienteController {
         return "redirect:/admin/ingredientes";
     }
 
-    @DeleteMapping("/{id}")
-    @ResponseBody
-    public ResponseEntity<?> eliminarIngrediente(@PathVariable Long id) {
-        try {
-            // Verificar si el ingrediente está siendo usado en productos
-            if (ingredienteService.estaEnProductos(id)) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("error", "No se puede eliminar el ingrediente porque está siendo usado en productos"));
-            }
-
+    @GetMapping("/eliminar/{id}")
+    public String eliminarIngrediente(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        if (ingredienteService.estaEnProductos(id)) {
+            redirectAttributes.addFlashAttribute("error", "No se puede eliminar el ingrediente porque se encuentra asociado a productos");
+        } else {
             ingredienteService.eliminar(id);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al eliminar el ingrediente: " + e.getMessage()));
+            redirectAttributes.addFlashAttribute("mensaje", "Producto eliminado exitosamente.");
         }
+        return "redirect:/admin/ingredientes";
     }
 }

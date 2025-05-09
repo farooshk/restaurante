@@ -23,7 +23,7 @@
             <div class="card h-100">
                 <img th:if="${categoria.urlImagen}" th:src="${categoria.urlImagen}" class="card-img-top"
                      alt="Imagen categoría">
-                <img th:unless="${categoria.urlImagen}" src="/static/img/default-category.jpg" class="card-img-top"
+                <img th:unless="${categoria.urlImagen}" src="/static/img/generico.png" class="card-img-top"
                      alt="Imagen por defecto">
                 <div class="card-body">
                     <h5 class="card-title" th:text="${categoria.nombre}">Nombre Categoría</h5>

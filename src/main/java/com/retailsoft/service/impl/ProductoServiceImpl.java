@@ -1,17 +1,21 @@
 package com.retailsoft.service.impl;
 
+import com.retailsoft.dto.CategoriaDTO;
 import com.retailsoft.dto.IngredienteDTO;
 import com.retailsoft.dto.ProductoDTO;
+import com.retailsoft.entity.Categoria;
 import com.retailsoft.entity.Ingrediente;
 import com.retailsoft.entity.Producto;
 import com.retailsoft.repository.PedidoRepository;
 import com.retailsoft.repository.ProductoRepository;
 import com.retailsoft.service.FileStorageService;
 import com.retailsoft.service.ProductoService;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -32,7 +36,11 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductoDTO> listarTodos() {
-        return productoRepository.findAll().stream()
+        List<Producto> productos = productoRepository.findAll();
+        // Crear una lista nueva para desacoplar de la sesión de Hibernate
+        List<Producto> productosSeguro = new ArrayList<>(productos);
+
+        return productosSeguro.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
@@ -55,7 +63,7 @@ public class ProductoServiceImpl implements ProductoService {
     @Transactional(readOnly = true)
     public boolean estaEnPedidos(Long id) {
         // Implementar lógica para verificar si el producto está en algún pedido
-        return pedidoRepository.existsByItemsPedidoProductoId(id);
+        return pedidoRepository.existsByItemsProductoId(id);
     }
 
     @Override
@@ -146,17 +154,32 @@ public class ProductoServiceImpl implements ProductoService {
             dto.setCategoria(categoriaDTO);
         }
 
-        // Convertir ingredientes
+        // Convertir ingredientes - MODIFICAR ESTA PARTE
         if (producto.getIngredientes() != null) {
-            List<IngredienteDTO> ingredientesDTO = producto.getIngredientes().stream()
-                    .map(ingrediente -> {
-                        IngredienteDTO ingredienteDTO = new IngredienteDTO();
-                        ingredienteDTO.setId(ingrediente.getId());
-                        ingredienteDTO.setNombre(ingrediente.getNombre());
-                        return ingredienteDTO;
-                    })
-                    .collect(Collectors.toList());
-            dto.setIngredientes(ingredientesDTO);
+            try {
+                // Primero, forzar la inicialización
+                Hibernate.initialize(producto.getIngredientes());
+
+                // Una vez inicializada, crear la lista de DTOs
+                List<IngredienteDTO> ingredientesDTO = new ArrayList<>();
+
+                for (Ingrediente ingrediente : producto.getIngredientes()) {
+                    IngredienteDTO ingredienteDTO = new IngredienteDTO();
+                    ingredienteDTO.setId(ingrediente.getId());
+                    ingredienteDTO.setNombre(ingrediente.getNombre());
+                    ingredienteDTO.setDescripcion(ingrediente.getDescripcion());
+                    ingredienteDTO.setPrecioPorcion(ingrediente.getPrecioPorcion());
+                    ingredienteDTO.setDisponible(ingrediente.isDisponible());
+                    ingredienteDTO.setEsAdicional(ingrediente.isEsAdicional());
+                    ingredienteDTO.setCantidadProductos(ingrediente.getProductos().size());
+                    ingredientesDTO.add(ingredienteDTO);
+                }
+
+                dto.setIngredientes(ingredientesDTO);
+            } catch (Exception e) {
+                // Si hay algún problema, al menos establecer una lista vacía
+                dto.setIngredientes(new ArrayList<>());
+            }
         }
 
         return dto;

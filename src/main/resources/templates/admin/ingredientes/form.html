@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/dashboard}">
+<head>
+    <div th:replace="fragments/header :: head('Ingredientes')"></div>
+    <title th:text="${ingrediente.id == null ? 'Nuevo Ingrediente' : 'Editar Ingrediente'}"></title>
+</head>
+<body>
+<!-- Fragmentos comunes -->
+<div th:replace="fragments/header :: navbar"></div>
+<br><br><br>
+<div layout:fragment="content">
+    <div class="container">
+        <h2 th:text="${ingrediente.id == null ? 'Nuevo Ingrediente' : 'Editar Ingrediente'}"></h2>
+        <div class="alert alert-success alert-dismissible fade show" th:if="${mensaje}" th:text="${mensaje}"></div>
+        <div class="alert alert-danger alert-dismissible fade show" th:if="${error}" th:text="${error}"></div>
+        <form th:action="@{/admin/ingredientes/guardar}" method="post" th:object="${ingrediente}">
+            <input type="hidden" th:field="*{id}" />
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombre" th:field="*{nombre}" required>
+                <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+            </div>
+            <div class="mb-3">
+                <label for="descripcion" class="form-label">Descripción</label>
+                <textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="3"></textarea>
+            </div>
+            <div class="col-3">
+                <label for="precioPorcion" class="form-label">Precio Porción</label>
+                <input type="number" class="form-control" id="precioPorcion" th:field="*{precioPorcion}" required>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="disponible" th:field="*{disponible}">
+                <label class="form-check-label" for="disponible">Disponible</label>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="esAdicional" th:field="*{esAdicional}">
+                <label class="form-check-label" for="esAdicional">Es Adición</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a th:href="@{/admin/ingredientes}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+<!-- Fragmento footer -->
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

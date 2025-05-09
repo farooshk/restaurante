@@ -1,6 +1,8 @@
 package com.retailsoft.service.impl;
 
+import com.retailsoft.dto.RolDTO;
 import com.retailsoft.dto.UsuarioDTO;
+import com.retailsoft.entity.Rol;
 import com.retailsoft.entity.Usuario;
 import com.retailsoft.repository.PedidoRepository;
 import com.retailsoft.repository.UsuarioRepository;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service

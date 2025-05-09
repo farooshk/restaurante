@@ -1,48 +1,75 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/dashboard}">
 <head>
-    <meta charset="UTF-8">
-    <title th:text="${usuario.id == null ? 'Nuevo Usuario' : 'Editar Usuario'}">Usuario</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <div th:replace="fragments/header :: head('Usuario')"></div>
+    <title th:text="${usuario.id == null ? 'Nuevo Usuario' : 'Editar Usuario'}"></title>
 </head>
 <body>
 <!-- Fragmentos comunes -->
-<div th:replace="fragments/header :: head('Usuario')"></div>
 <div th:replace="fragments/header :: navbar"></div>
-<div class="container mt-4">
-    <h2 th:text="${usuario.id == null ? 'Nuevo Usuario' : 'Editar Usuario'}">Usuario</h2>
-    <form th:action="@{/admin/usuarios/guardar}" method="post">
-        <input type="hidden" name="id" th:value="${usuario.id}">
-        <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="nombre" name="nombre" th:value="${usuario.nombre}" required>
-        </div>
-        <div class="mb-3">
-            <label for="username" class="form-label">Usuario</label>
-            <input type="text" class="form-control" id="username" name="username" th:value="${usuario.username}"
-                   required>
-        </div>
-        <div class="mb-3">
-            <label for="tipo" class="form-label">Rol</label>
-            <select class="form-select" id="tipo" name="tipo" required>
-                <option value="" disabled>Seleccione un rol</option>
-                <option th:each="tipo : ${tiposUsuario}"
-                        th:value="${tipo}"
-                        th:text="${tipo}"
-                        th:selected="${usuario.tipo == tipo}">
-                </option>
-            </select>
-        </div>
-        <div class="mb-3" th:if="${usuario.id == null}">
-            <label for="password" class="form-label">Contraseña</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-        <div class="d-flex justify-content-between">
-            <a th:href="@{/admin/usuarios}" class="btn btn-secondary">Cancelar</a>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-        </div>
-    </form>
+<br><br><br>
+<div layout:fragment="content">
+    <div class="container">
+        <h2 th:text="${usuario.id == null ? 'Nuevo Usuario' : 'Editar Usuario'}"></h2>
+        <form th:action="@{/admin/usuarios/guardar}" method="post" th:object="${usuario}">
+            <input type="hidden" th:field="*{id}" />
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" th:field="*{nombre}" required>
+                        <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="apellido" class="form-label">Apellido</label>
+                        <input type="text" class="form-control" id="apellido" th:field="*{apellido}" required>
+                        <div class="text-danger" th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                        <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nombre de usuario</label>
+                        <input type="text" class="form-control" id="username" th:field="*{username}" required>
+                        <div class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" th:field="*{password}" th:required="${usuario.id == null}">
+                        <small class="text-muted" th:if="${usuario.id != null}">Deja vacío para mantener la contraseña actual</small>
+                        <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="activo" th:field="*{activo}">
+                        <label class="form-check-label" for="activo">Activo</label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Roles</label>
+                        <div class="border p-3 rounded">
+                            <div class="form-check" th:each="rol : ${roles}">
+                                <input class="form-check-input" type="checkbox" name="rolesIds"
+                                       th:value="${rol.id}" th:id="${'rol-' + rol.id}"
+                                       th:checked="${usuario.roles != null and usuario.roles.?[id == __${rol.id}__].size() > 0}">
+                                <label class="form-check-label" th:for="${'rol-' + rol.id}" th:text="${rol.nombre}"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a th:href="@{/admin/usuarios}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
 </div>
+<!-- Fragmento footer -->
 <div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

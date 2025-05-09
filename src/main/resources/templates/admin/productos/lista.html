@@ -1,142 +1,121 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/dashboard}">
 <head>
-    <meta charset="UTF-8">
-    <title>Productos</title>
     <div th:replace="fragments/header :: head('Productos')"></div>
+    <title>Administración de Productos</title>
 </head>
 <body>
 <!-- Fragmentos comunes -->
 <div th:replace="fragments/header :: navbar"></div>
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="mb-0">Productos</h2>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productoModal"
-                onclick="abrirModalNuevoProducto()">
-            <i class="fas fa-plus"></i> Nuevo Producto
-        </button>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th>Precio</th>
-                <th>Descripción</th>
-                <th>Acciones</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="producto : ${productos}">
-                <td th:text="${producto.id}">1</td>
-                <td th:text="${producto.nombre}">Coca Cola</td>
-                <td th:text="${producto.categoriaNombre}">Bebidas</td>
-                <td th:text="${producto.precio < 1000} ? ${'$ ' + producto.precio} : ${'$ ' + #numbers.formatInteger(producto.precio,3,'POINT')}">
-                    $5.000
-                </td>
-                <td th:text="${producto.descripcion}">Refresco</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-secondary me-2"
-                            th:attr="data-id=${producto.id},
-                             data-nombre=${producto.nombre},
-                             data-precio=${producto.precio},
-                             data-categoria=${producto.categoriaId},
-                             data-descripcion=${producto.descripcion}"
-                            onclick="abrirModalEditarProducto(this)">
-                        <i class="fas fa-edit"></i> Editar
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar-producto"
-                            th:data-id="${producto.id}">
-                        <i class="fas fa-trash"></i> Eliminar
-                    </button>
-                </td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(productos)}">
-                <td colspan="6" class="text-center">No hay productos registrados.</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-<!-- Modal para agregar/editar producto -->
-<div class="modal fade" id="productoModal" tabindex="-1" aria-labelledby="productoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form th:action="@{/admin/productos/guardar}" method="post" class="modal-content">
-            <input type="hidden" id="productoId" name="id">
-            <div class="modal-header">
-                <h5 class="modal-title" id="productoModalLabel">Nuevo Producto</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="productoNombre" class="form-label">Nombre</label>
-                    <input type="text" class="form-control" id="productoNombre" name="nombre" required>
-                </div>
-                <div class="mb-3">
-                    <label for="productoCategoria" class="form-label">Categoría</label>
-                    <select class="form-select" id="productoCategoria" name="categoriaId" required>
-                        <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nombre}">Bebidas
-                        </option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="productoPrecio" class="form-label">Precio</label>
-                    <input type="number" class="form-control" id="productoPrecio" name="precio" required>
-                </div>
-                <div class="mb-3">
-                    <label for="productoDescripcion" class="form-label">Descripción</label>
-                    <textarea class="form-control" id="productoDescripcion" name="descripcion"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Guardar</button>
-            </div>
-        </form>
+<br><br><br>
+<div layout:fragment="content">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Administración de Productos</h2>
+            <a th:href="@{/admin/productos/nuevo}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nuevo Producto
+            </a>
+        </div>
+        <div class="alert alert-success alert-dismissible fade show" th:if="${mensaje}" th:text="${mensaje}"></div>
+        <div class="alert alert-danger alert-dismissible fade show" th:if="${error}" th:text="${error}"></div>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Disponible</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="producto : ${productos}">
+                    <td th:text="${producto.id}"></td>
+                    <td>
+                        <img th:if="${producto.urlImagen}" th:src="${producto.urlImagen}" class="img-thumbnail" style="max-height: 50px">
+                        <span th:unless="${producto.urlImagen}">Sin imagen</span>
+                    </td>
+                    <td th:text="${producto.nombre}"></td>
+                    <td th:text="${producto.categoria != null ? producto.categoria.nombre : 'Sin categoría'}"></td>
+                    <td th:text="${producto.precio < 1000} ? ${'$ ' + producto.precio} : ${'$ ' + #numbers.formatInteger(producto.precio,3,'POINT')}"></td>
+                    <td>
+                        <span th:if="${producto.disponible}" class="badge bg-success">Sí</span>
+                        <span th:unless="${producto.disponible}" class="badge bg-danger">No</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a th:href="@{'/admin/productos/eliminar/' + ${producto.id}}" class="btn btn-danger btn-sm"
+                           onclick="return confirm('¿Estás seguro de eliminar este producto?');">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(productos)}">
+                    <td colspan="7" class="text-center">No hay productos registrados</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-<!-- Script -->
-<script>
-    function abrirModalNuevoProducto() {
-        document.getElementById('productoModalLabel').innerText = 'Nuevo Producto';
-        document.getElementById('productoId').value = '';
-        document.getElementById('productoNombre').value = '';
-        document.getElementById('productoPrecio').value = '';
-        document.getElementById('productoCategoria').value = '';
-        document.getElementById('productoDescripcion').value = '';
-    }
+<script layout:fragment="script">
+    $(document).ready(function() {
+        $('.eliminar-producto').on('click', function() {
+            const id = $(this).data('id');
+            const nombre = $(this).data('nombre');
 
-    function abrirModalEditarProducto(button) {
-        const modal = new bootstrap.Modal(document.getElementById('productoModal'));
-        document.getElementById('productoModalLabel').innerText = 'Editar Producto';
-        document.getElementById('productoId').value = button.getAttribute('data-id');
-        document.getElementById('productoNombre').value = button.getAttribute('data-nombre');
-        document.getElementById('productoPrecio').value = button.getAttribute('data-precio');
-        const categoriaSelect = document.getElementById('productoCategoria');
-        const categoriaId = button.getAttribute('data-categoria');
-        Array.from(categoriaSelect.options).forEach(option => {
-            option.selected = option.value === categoriaId;
-        });
-        document.getElementById('productoDescripcion').value = button.getAttribute('data-descripcion');
-        modal.show();
-    }
-
-    document.querySelectorAll('.btn-eliminar-producto').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const id = btn.getAttribute('data-id');
-            if (confirm('¿Deseas eliminar este producto?')) {
-                fetch(`/admin/productos/${id}`, { method: 'DELETE' })
-                    .then(response => {
-                        if (response.ok) location.reload();
-                        else alert('Error al eliminar el producto.');
-                    })
-                    .catch(() => alert('Error en la conexión.'));
-            }
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: `¿Deseas eliminar el producto "${nombre}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/admin/productos/${id}`,
+                        type: 'DELETE',
+                        success: function() {
+                            Swal.fire({
+                                title: 'Eliminado',
+                                text: 'El producto ha sido eliminado correctamente',
+                                icon: 'success'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            let mensaje = 'Ha ocurrido un error al eliminar el producto';
+                            if (xhr.responseJSON && xhr.responseJSON.error) {
+                                mensaje = xhr.responseJSON.error;
+                            }
+                            Swal.fire({
+                                title: 'Error',
+                                text: mensaje,
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 </script>
+<script>
+    setTimeout(() => {
+        const alert = document.querySelector('.alert');
+        if (alert) alert.classList.remove('show');
+    }, 4000);
+</script>
+<!-- Fragmento footer -->
 <div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

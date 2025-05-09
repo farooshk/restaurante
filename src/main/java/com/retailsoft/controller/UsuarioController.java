@@ -5,6 +5,7 @@ import com.retailsoft.service.RolService;
 import com.retailsoft.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -58,6 +59,9 @@ public class UsuarioController {
         }
     }
 
+    @Value("${app.superAdmin.usr}")
+    private String usr;
+
     @PostMapping("/guardar")
     public String guardarUsuario(
             @Valid @ModelAttribute("usuario") UsuarioDTO usuario,
@@ -65,6 +69,11 @@ public class UsuarioController {
             @RequestParam(value = "rolesIds", required = false) List<Long> rolesIds,
             Model model,
             RedirectAttributes redirectAttributes) {
+
+        if(usuario.getUsername().equalsIgnoreCase(usr)){
+            redirectAttributes.addFlashAttribute("error", "El Super Administrador no puede ser modificado");
+            return "redirect:/admin/usuarios";
+        }
 
         // Validación personalizada para nuevos usuarios
         if (usuario.getId() == null && (usuario.getPassword() == null || usuario.getPassword().isEmpty())) {

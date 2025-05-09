@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                    data-ingrediente-nombre="${ingrediente.nombre}"
                                    data-ingrediente-precio="${ingrediente.precioPorcion}">
                             <label class="form-check-label" for="adicional_${ingrediente.id}">
-                                ${ingrediente.nombre} (+$${ingrediente.precioPorcion})
+                                ${ingrediente.nombre} (+$${ingrediente.precioPorcion.toLocaleString('es-CO')})
                             </label>
                         `;
                         adicionalesList.appendChild(adicionalItem);

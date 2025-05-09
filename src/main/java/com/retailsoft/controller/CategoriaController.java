@@ -38,7 +38,7 @@ public class CategoriaController {
         return "admin/categorias/lista";
     }
 
-    @GetMapping("/form")
+    @GetMapping("/nueva")
     public String mostrarFormulario(Model model) {
         model.addAttribute("categoria", new CategoriaDTO());
         return "admin/categorias/form";
@@ -84,21 +84,14 @@ public class CategoriaController {
         return "redirect:/admin/categorias";
     }
 
-    @DeleteMapping("/{id}")
-    @ResponseBody
-    public ResponseEntity<?> eliminarCategoria(@PathVariable Long id) {
-        try {
-            // Verificar si la categoría tiene productos asociados
-            if (categoriaService.tieneProductosAsociados(id)) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("error", "No se puede eliminar la categoría porque tiene productos asociados"));
-            }
-
+    @GetMapping("/eliminar/{id}")
+    public String eliminarCategoria(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        if (categoriaService.tieneProductosAsociados(id)) {
+            redirectAttributes.addFlashAttribute("error", "No se puede eliminar la categoría porque tiene productos asociados");
+        } else {
             categoriaService.eliminar(id);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error al eliminar la categoría: " + e.getMessage()));
+            redirectAttributes.addFlashAttribute("mensaje", "Categoría eliminada exitosamente.");
         }
+        return "redirect:/admin/categorias";
     }
 }

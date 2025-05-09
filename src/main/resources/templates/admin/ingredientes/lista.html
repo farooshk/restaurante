@@ -1,134 +1,79 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/dashboard}">
 <head>
-  <meta charset="UTF-8">
-  <title>Ingredientes</title>
-  <link rel="stylesheet" th:href="@{/css/styles.css}">
-  <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+  <div th:replace="fragments/header :: head('Ingredientes')"></div>
+  <title>Administración de Ingredientes</title>
 </head>
 <body>
-
 <!-- Fragmentos comunes -->
-<div th:replace="fragments/header :: head('Ingredientes')"></div>
 <div th:replace="fragments/header :: navbar"></div>
-
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Ingredientes</h2>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ingredienteModal" onclick="abrirModalNuevoIngrediente()">
-      <i class="fas fa-plus"></i> Nuevo Ingrediente
-    </button>
-  </div>
-
-  <div class="table-responsive">
-    <table class="table table-bordered table-hover">
-      <thead class="table-light">
-      <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Precio por Porción</th>
-        <th>Es Adicional</th>
-        <th>Acciones</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr th:each="ingrediente : ${ingredientes}">
-        <td th:text="${ingrediente.id}">1</td>
-        <td th:text="${ingrediente.nombre}">Queso</td>
-        <td th:text="${ingrediente.precioPorcion < 1000} ? ${'$ ' + ingrediente.precioPorcion} : ${'$ ' + #numbers.formatInteger(ingrediente.precioPorcion,3,'POINT')}">$15.000</td>
-        <td th:text="${ingrediente.esAdicional ? 'Sí' : 'No'}">Sí</td>
-        <td>
-          <button class="btn btn-sm btn-outline-secondary me-2"
-                  th:attr="onclick=|abrirModalEditarIngrediente(${ingrediente.id}, '${ingrediente.nombre}', ${ingrediente.precioPorcion}, ${ingrediente.esAdicional})|">
-            <i class="fas fa-edit"></i> Editar
-          </button>
-          <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar"
-                  th:data-id="${ingrediente.id}">
-            <i class="fas fa-trash"></i> Eliminar
-          </button>
-        </td>
-      </tr>
-      <tr th:if="${#lists.isEmpty(ingredientes)}">
-        <td colspan="5" class="text-center">No hay ingredientes registrados.</td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Modal -->
-<div class="modal fade" id="ingredienteModal" tabindex="-1" aria-labelledby="ingredienteModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form th:action="@{/admin/ingredientes/guardar}" method="post" class="modal-content">
-      <input type="hidden" id="ingredienteId" name="id">
-      <div class="modal-header">
-        <h5 class="modal-title" id="ingredienteModalLabel">Nuevo Ingrediente</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label for="nombreIngrediente" class="form-label">Nombre</label>
-          <input type="text" class="form-control" id="nombreIngrediente" name="nombre" required>
-        </div>
-        <div class="mb-3">
-          <label for="precioPorcion" class="form-label">Precio por Porción</label>
-          <input type="number" class="form-control" id="precioPorcion" name="precioPorcion" min="0" step="0.01" required>
-        </div>
-        <div class="form-check mb-3">
-          <input class="form-check-input" type="checkbox" id="esAdicional" name="esAdicional">
-          <label class="form-check-label" for="esAdicional">
-            Es adicional
-          </label>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Guardar</button>
-      </div>
-    </form>
+<br><br><br>
+<div layout:fragment="content">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Administración de Ingredientes</h2>
+      <a th:href="@{/admin/ingredientes/nuevo}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nuevo Ingrediente
+      </a>
+    </div>
+    <div class="alert alert-success alert-dismissible fade show" th:if="${mensaje}" th:text="${mensaje}"></div>
+    <div class="alert alert-danger alert-dismissible fade show" th:if="${error}" th:text="${error}"></div>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio Poción</th>
+          <th>Disponible</th>
+          <th>Es Adición</th>
+          <th>Productos</th>
+          <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="ingrediente : ${ingredientes}">
+          <td th:text="${ingrediente.id}"></td>
+          <td th:text="${ingrediente.nombre}"></td>
+          <td th:text="${ingrediente.descripcion}"></td>
+          <td th:text="${ingrediente.precioPorcion < 1000} ? ${'$ ' + ingrediente.precioPorcion} : ${'$ ' + #numbers.formatInteger(ingrediente.precioPorcion,3,'POINT')}">$15.000</td>
+          <td>
+            <span th:if="${ingrediente.disponible}" class="badge bg-success">Sí</span>
+            <span th:unless="${ingrediente.disponible}" class="badge bg-danger">No</span>
+          </td>
+          <td>
+            <span th:if="${ingrediente.esAdicional}" class="badge bg-success">Sí</span>
+            <span th:unless="${ingrediente.esAdicional}" class="badge bg-danger">No</span>
+          </td>
+          <td th:text="${ingrediente.cantidadProductos}"></td>
+          <td>
+            <a th:href="@{/admin/ingredientes/editar/{id}(id=${ingrediente.id})}" class="btn btn-sm btn-warning">
+              <i class="fas fa-edit"></i> Editar
+            </a>
+            <a th:href="@{'/admin/ingredientes/eliminar/' + ${ingrediente.id}}" class="btn btn-danger btn-sm"
+               onclick="return confirm('¿Estás seguro de eliminar este ingrediente?');">
+              <i class="fas fa-trash"></i> Eliminar
+            </a>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(ingredientes)}">
+          <td colspan="6" class="text-center">No hay ingredientes registrados</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
-
 <script>
-  function abrirModalNuevoIngrediente() {
-      document.getElementById('ingredienteModalLabel').innerText = 'Nuevo Ingrediente';
-      document.getElementById('ingredienteId').value = '';
-      document.getElementById('nombreIngrediente').value = '';
-      document.getElementById('precioPorcion').value = '';
-      document.getElementById('esAdicional').checked = false;
-  }
-
-  function abrirModalEditarIngrediente(id, nombre, precio, esAdicional) {
-      const modal = new bootstrap.Modal(document.getElementById('ingredienteModal'));
-      document.getElementById('ingredienteModalLabel').innerText = 'Editar Ingrediente';
-      document.getElementById('ingredienteId').value = id;
-      document.getElementById('nombreIngrediente').value = nombre;
-      document.getElementById('precioPorcion').value = precio;
-      document.getElementById('esAdicional').checked = esAdicional;
-      modal.show();
-  }
-
-  document.querySelectorAll('.btn-eliminar').forEach(btn => {
-      btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-id');
-          if (confirm('¿Deseas eliminar este ingrediente?')) {
-              fetch(`/admin/ingredientes/${id}`, {
-                  method: 'DELETE'
-              })
-              .then(response => {
-                  if (response.ok) {
-                      location.reload();
-                  } else {
-                      alert('Error al eliminar el ingrediente.');
-                  }
-              })
-              .catch(() => alert('Error en la conexión.'));
-          }
-      });
-  });
+  setTimeout(() => {
+      const alert = document.querySelector('.alert');
+      if (alert) alert.classList.remove('show');
+  }, 4000);
 </script>
-
+<!-- Fragmento footer -->
 <div th:replace="fragments/footer :: footer"></div>
-
 </body>
 </html>

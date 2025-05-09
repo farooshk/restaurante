@@ -21,6 +21,12 @@ public class DataInitializer implements CommandLineRunner {
     @Value("${app.superAdmin.name}")
     private String name;
 
+    @Value("${app.superAdmin.surname}")
+    private String surname;
+
+    @Value("${app.superAdmin.email}")
+    private String email;
+
     @Value("${app.superAdmin.usr}")
     private String usr;
 
@@ -37,6 +43,8 @@ public class DataInitializer implements CommandLineRunner {
             admin.setUsername(superAdmin);
             admin.setPassword(passwordEncoder.encode(pass)); // contraseña segura
             admin.setNombre(name);
+            admin.setApellido(surname);
+            admin.setEmail(email);
             admin.setTipoUsuario(TipoUsuario.ADMINISTRADOR);
             admin.setActivo(true);
 

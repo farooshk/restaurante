@@ -20,13 +20,13 @@ public class PrinterUtil {
     public String generarTextoComanda(ComandaDTO comanda) {
         List<String> lineas = new ArrayList<>();
 
-        lineas.add("===== "+ customer +" =====");
-        lineas.add("======== COMANDA ========");
+        lineas.add("======== "+ customer +" =========");
+        lineas.add("=========== COMANDA ============");
         lineas.add("Pedido #: " + comanda.getPedidoId());
         lineas.add("Mesa: " + comanda.getMesa());
         lineas.add("Mesero: " + comanda.getMesero());
         lineas.add(comanda.getFechaHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
-        lineas.add("-------------------------");
+        lineas.add("--------------------------------");
 
         for (ComandaDTO.ItemComandaDTO item : comanda.getItems()) {
             lineas.add(item.getCategoria());
@@ -44,10 +44,10 @@ public class PrinterUtil {
                 lineas.add("  Obs: " + item.getObservaciones());
             }
 
-            lineas.add("-------------------------");
+            lineas.add("--------------------------------");
         }
 
-        lineas.add("---- FIN DE COMANDA ----");
+        lineas.add("-------- FIN DE COMANDA --------");
         return String.join("\n", lineas);
     }
 
