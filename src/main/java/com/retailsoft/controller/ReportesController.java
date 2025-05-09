@@ -70,7 +70,7 @@ public class ReportesController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reportes_ventas.xlsx");
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_de_ventas.xlsx");
 
         return new ResponseEntity<>(archivo, headers, HttpStatus.OK);
     }

@@ -24,6 +24,7 @@
             <thead class="table-dark">
             <tr>
                 <th>ID</th>
+                <th>Imagen</th>
                 <th>Nombre</th>
                 <th>Acciones</th>
             </tr>
@@ -31,6 +32,10 @@
             <tbody>
             <tr th:each="categoria : ${categorias}">
                 <td th:text="${categoria.id}">1</td>
+                <td>
+                    <img th:if="${categoria.urlImagen}" th:src="${categoria.urlImagen}" class="img-thumbnail" style="max-height: 50px">
+                    <span th:unless="${categoria.urlImagen}">Sin imagen</span>
+                </td>
                 <td th:text="${categoria.nombre}">Bebidas</td>
                 <td>
                     <a th:href="@{/admin/categorias/editar/{id}(id=${categoria.id})}" class="btn btn-sm btn-warning">

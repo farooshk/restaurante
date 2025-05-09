@@ -98,10 +98,21 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setEmail(usuarioDTO.getEmail());
         usuario.setUsername(usuarioDTO.getUsername());
         usuario.setPassword(usuarioDTO.getPassword());
-        usuario.setActivo(usuarioDTO.isActivo());
+
+        // Aplicar regla: sin roles = inactivo
+        boolean tieneRoles = usuarioDTO.getRoles() != null && !usuarioDTO.getRoles().isEmpty();
+        usuario.setActivo(tieneRoles && usuarioDTO.isActivo());
+
+        // Determinar tipo de usuario según roles
+        usuario.setTipoUsuario(
+                usuarioDTO.getRoles() != null && usuarioDTO.getRoles().stream()
+                        .anyMatch(rol -> "ADMINISTRADOR".equalsIgnoreCase(rol.getNombre()))
+                        ? Usuario.TipoUsuario.ADMINISTRADOR
+                        : Usuario.TipoUsuario.MESERO
+        );
 
         // Actualizar roles
-        if (usuarioDTO.getRoles() != null) {
+        if (tieneRoles) {
             Set<Rol> roles = usuarioDTO.getRoles().stream()
                     .map(dto -> {
                         Rol rol = new Rol();
@@ -136,11 +147,19 @@ public class UsuarioServiceImpl implements UsuarioService {
         dto.setApellido(usuario.getApellido());
         dto.setEmail(usuario.getEmail());
         dto.setUsername(usuario.getUsername());
-        dto.setPassword(""); // No enviar la contraseña en el DTO
-        dto.setActivo(usuario.isActivo());
+        dto.setPassword(""); // No enviar la contraseña
+
+        // Considerar al usuario inactivo si no tiene roles
+        boolean tieneRoles = usuario.getRoles() != null && !usuario.getRoles().isEmpty();
+        dto.setActivo(tieneRoles && usuario.isActivo());
+
+        // Determinar tipo de usuario según roles
+        boolean esAdmin = usuario.getRoles().stream()
+                .anyMatch(rol -> "ADMINISTRADOR".equalsIgnoreCase(rol.getNombre()));
+        dto.setTipoUsuario(esAdmin ? Usuario.TipoUsuario.ADMINISTRADOR : Usuario.TipoUsuario.MESERO);
 
         // Convertir roles
-        if (usuario.getRoles() != null) {
+        if (tieneRoles) {
             List<RolDTO> rolesDTO = usuario.getRoles().stream()
                     .map(rol -> {
                         RolDTO rolDTO = new RolDTO();

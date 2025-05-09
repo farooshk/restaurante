@@ -1,5 +1,6 @@
 package com.retailsoft.dto;
 
+import com.retailsoft.entity.Usuario;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -37,5 +38,6 @@ public class UsuarioDTO {
 
     private String password;
     private boolean activo = true;
+    private Usuario.TipoUsuario tipoUsuario;
     private List<RolDTO> roles = new ArrayList<>();
 }

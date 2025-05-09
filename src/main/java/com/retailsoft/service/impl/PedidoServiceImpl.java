@@ -14,9 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -297,18 +299,31 @@ public class PedidoServiceImpl implements PedidoService {
 
             // Encabezados
             Row header = sheet.createRow(fila++);
-            String[] columnas = {"ID", "Fecha", "Mesa", "Mesero", "Total", "Estado"};
+            String[] columnas = {"ID", "Fecha", "Cliente", "Mesero", "Total", "Estado"};
             for (int i = 0; i < columnas.length; i++) {
                 header.createCell(i).setCellValue(columnas[i]);
             }
 
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
+            formatoMoneda.setMaximumFractionDigits(0); // 👈 Sin centavos
+            formatoMoneda.setMinimumFractionDigits(0); // 👈 Sin ceros innecesarios
             // Datos de pedidos
             for (PedidoDTO pedido : resumen.getPedidos()) {
                 Row row = sheet.createRow(fila++);
                 row.createCell(0).setCellValue(pedido.getId());
-                row.createCell(1).setCellValue(pedido.getFechaHora().toString());
+
+                String fechaHoraFormateada = pedido.getFechaHora().format(formatter);
+                row.createCell(1).setCellValue(fechaHoraFormateada);
+
                 row.createCell(2).setCellValue(pedido.getMesa() != null ? pedido.getMesa() : "Sin especificar");
                 row.createCell(3).setCellValue(pedido.getUsuarioNombre());
+
+/*
+                String valorFormateado = formatoMoneda.format(pedido.getTotal());
+                row.createCell(4).setCellValue(valorFormateado);
+*/
+
                 row.createCell(4).setCellValue(pedido.getTotal());
                 row.createCell(5).setCellValue(pedido.getEstado().name());
             }

@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     a.click();
                     document.body.removeChild(a);
 
-                    alert('✅ Comanda descargada. Ábrela con ESC POS Bluetooth Print Service para imprimir.');
+                    alert('✅ Comanda descargada. Ábrela con RawBT para imprimir.');
                 })
                 .catch(error => {
                     console.error('❌ Error:', error);
