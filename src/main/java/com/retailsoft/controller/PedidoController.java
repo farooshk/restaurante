@@ -10,6 +10,7 @@ import com.retailsoft.service.ProductoService;
 import com.retailsoft.service.UsuarioService;
 import com.retailsoft.utils.PrinterUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -119,6 +121,12 @@ public class PedidoController {
         }
 
         String textoComanda = printerUtil.generarTextoComanda(comanda);
-        return ResponseEntity.ok(textoComanda);
+
+        String bom = "\uFEFF"; // BOM para UTF-8
+        String textoConBom = bom + textoComanda;
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
+                .body(textoConBom);
     }
 }

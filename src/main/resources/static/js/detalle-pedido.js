@@ -75,7 +75,8 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch(`/pedidos/${pedidoId}/comanda-texto`)
                 .then(response => response.text())
                 .then(texto => {
-                    const blob = new Blob([texto], { type: 'text/plain' });
+                    const utf8BOM = "\uFEFF"; // Byte Order Mark
+                    const blob = new Blob([utf8BOM + texto], { type: 'text/plain;charset=utf-8' });
                     const url = URL.createObjectURL(blob);
 
                     const a = document.createElement('a');

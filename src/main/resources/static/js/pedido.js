@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ingredientesBaseList.innerHTML = '';
 
         // Guardar ingredientes base
-        ingredientesBase = producto.ingredientesBase || [];
+        ingredientesBase = producto.ingredientes || [];
 
         if (ingredientesBase.length > 0) {
             ingredientesBase.forEach(ingrediente => {
